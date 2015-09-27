@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+
+<% if (testScssLint) { %>gem 'scss_lint', require: false<% } %>
+<% if (htmlJekyll || addDocumentation) { %>gem 'jekyll', '~> 2.5.3'<% } %>

@@ -1,0 +1,3 @@
+{
+    "directory" : "<%= sourcePath %>/libs/bower"
+}

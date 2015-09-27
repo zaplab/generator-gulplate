@@ -1,0 +1,5 @@
+<%= distributionPath %>/css/
+<%= distributionPath %>/img/
+<%= distributionPath %>/js/
+node_modules
+<%= sourcePath %>/libs/bower

@@ -1,0 +1,11 @@
+rules:<% if (indentation == 'tabs') { %>
+  # indentation has a bug in v1.2 so not testing for it
+  # https://github.com/sasstools/sass-lint/issues/62<% } %>
+  indentation:<% if (indentation == 'tabs') { %> 0<% } else { %>
+    - 2
+    -
+      size: <%=indentationSpaces %><% } %>
+  property-sort-order: 0
+  no-color-literals: 0
+  no-duplicate-properties: 0
+  no-ids: 0

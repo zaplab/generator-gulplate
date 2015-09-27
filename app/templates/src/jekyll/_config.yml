@@ -1,0 +1,4 @@
+name: <%= projectName %><% if (projectType == "module") { %> Documentation<% } %>
+markdown: redcarpet
+pygments: true
+devMode: false
