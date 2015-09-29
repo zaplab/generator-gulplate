@@ -417,8 +417,7 @@ module.exports = yeoman.generators.Base.extend({
         bower: function () {
             var bower = {
                 name: this._.slugify(this.projectName),
-                private: true,
-                version: '0.0.0',
+                'private': true,
                 dependencies: {
                     'compass-breakpoint': '~2.6.1',
                     'compass-mixins': '~0.12.6'
