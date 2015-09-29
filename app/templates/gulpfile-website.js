@@ -168,7 +168,24 @@ gulp.task('test-js', [<% if (testESLint) { %>
 gulp.task('test', [
     <% if (testSassLint) { %>'test-css',<% } %>
     'test-js',
-]);
+]);<% if (htmlJekyll) { %>
+
+gulp.task('jekyll', function (gulpCallBack) {
+    var spawn = require('child_process').spawn;
+    var jekyll = spawn('bundler', [
+        'exec',
+        'jekyll',
+        'build',
+        '--source', '<%= sourcePath %>/jekyll',
+        '--destination', '<%= distributionPath %>',
+    ], {
+        stdio: 'inherit'
+    });
+
+    jekyll.on('exit', function(code) {
+        gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
+    });
+});<% } %>
 
 gulp.task('css', ['test-css'], function() {
     return gulp.src('<%= sourcePath %>/css/main.scss')
@@ -315,7 +332,18 @@ gulp.task('images', function() {
 gulp.task('watch', function () {
     gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css']);
     gulp.watch('<%= sourcePath %>/js/**/*.js', ['js']);
-    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images']);
+    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images']);<% if (htmlJekyll) { %>
+    gulp.watch('<%= sourcePath %>/jekyll/**/*.html', function () {
+        runSequence(
+            'jekyll',
+            [
+                'css',
+                'js',
+                'images',
+            ],
+            'clean:end'
+        );
+    });<% } %>
 });
 
 gulp.task('_serve', [
@@ -345,7 +373,8 @@ gulp.task('serve', function () {
 });
 
 gulp.task('default', ['clean'], function (cb) {
-    runSequence(
+    runSequence(<% if (htmlJekyll) { %>
+        'jekyll',<% } %>
         [
             'css',
             'js',
