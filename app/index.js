@@ -419,23 +419,24 @@ module.exports = yeoman.generators.Base.extend({
                 name: this._.slugify(this.projectName),
                 'private': true,
                 dependencies: {
-                    'compass-breakpoint': '~2.6.1',
-                    'compass-mixins': '~0.12.6'
+                    'compass-breakpoint': '^2.6.1',
+                    'compass-mixins': '^0.12.7',
+                    susy: '^2.2.6'
                 },
                 devDependencies: {}
             };
 
             if (this.moduleLoader == 'requirejs') {
-                bower.dependencies.requirejs = '~2.1.15';
+                bower.dependencies.requirejs = '^2.1.15';
             }
 
             if (this.testMocha) {
-                bower.devDependencies.chai = '~1.10.0';
-                bower.devDependencies.mocha = '~2.1.0';
+                bower.devDependencies.chai = '^1.10.0';
+                bower.devDependencies.mocha = '^2.1.0';
             }
 
             if (this.addDocumentation) {
-                bower.devDependencies['google-code-prettify'] = '~1.0.4';
+                bower.devDependencies['google-code-prettify'] = '^1.0.4';
             }
 
             this.copy('bowerrc', '.bowerrc');
