@@ -18,7 +18,6 @@ var sass = require('gulp-sass');
 var sourcemaps = require('gulp-sourcemaps');<% if (testMocha) { %>
 var mochaPhantomJS = require('gulp-mocha-phantomjs');<% } %>
 var browserSync = require('browser-sync');
-var browserSyncReload = browserSync.reload;
 var runSequence = require('run-sequence');
 var header = require('gulp-header');<% if (moduleLoader == "requirejs") { %>
 var requirejsOptimize = require('gulp-requirejs-optimize');<% } %>
@@ -202,7 +201,9 @@ gulp.task('css', ['test-css'], function() {
         })))
         .pipe(gulpif(!isDevMode, cssmin()))
         .pipe(gulp.dest('<%= distributionPath %>/resources/css'))
-        .pipe(gulpif(isServeTask, browserSync.stream()))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.css'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });
@@ -298,7 +299,9 @@ gulp.task('js', [<% if (testESLint) { %>
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
-        .pipe(gulpif(isServeTask, browserSync.stream()))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.js'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });<% } %>
@@ -356,10 +359,9 @@ gulp.task('_serve', [
         }
     });
 
-    gulp.watch('<%= distributionPath %>/**/*.html', browserSyncReload);
-    gulp.watch('<%= distributionPath %>/resources/css/**/*.css', browserSyncReload);
-    gulp.watch('<%= distributionPath %>/resources/js/**/*.js', browserSyncReload);
-    gulp.watch('<%= distributionPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSyncReload);
+    gulp.watch('<%= distributionPath %>/**/*.html', browserSync.reload);
+    gulp.watch('<%= distributionPath %>/resources/js/**/*.js', browserSync.reload);
+    gulp.watch('<%= distributionPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSync.reload);
 });
 
 gulp.task('serve', function () {

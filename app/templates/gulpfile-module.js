@@ -276,7 +276,9 @@ gulp.task('js', [<% if (testESLint) { %>
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= distributionPath %>/js'))
-        .pipe(gulpif(isServeTask, browserSync.stream()))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.js'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });<% } %>
@@ -323,10 +325,9 @@ gulp.task('_serve', [
         }
     });
 
-    gulp.watch('<%= documentationPath %>/**/*.html', browserSyncReload);
-    gulp.watch('<%= documentationPath %>/resources/css/**/*.css', browserSyncReload);
-    gulp.watch('<%= documentationPath %>/resources/js/**/*.js', browserSyncReload);
-    gulp.watch('<%= documentationPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSyncReload);
+    gulp.watch('<%= documentationPath %>/**/*.html', browserSync.reload);
+    gulp.watch('<%= documentationPath %>/resources/js/**/*.js', browserSync.reload);
+    gulp.watch('<%= documentationPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSync.reload);
 });
 
 gulp.task('serve', function () {
