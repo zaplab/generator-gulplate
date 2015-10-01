@@ -1,6 +1,6 @@
 {
   "name": "generator-gulplate",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "gulp based project yeoman-generator",
   "author": {
     "name" : "Sebastian Herber",
