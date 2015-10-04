@@ -4,7 +4,6 @@
 var argv = require('yargs').argv;<% if (testMocha) { %>
 var connect = require('gulp-connect');<% } %>
 var del = require('del');
-var gutil = require('gulp-util');
 var gulp = require('gulp');<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
 var babel = require('gulp-babel');<% } %>
 var gulpif = require('gulp-if');
@@ -23,6 +22,7 @@ var runSequence = require('run-sequence');
 var header = require('gulp-header');<% if (moduleLoader == "requirejs") { %>
 var requirejsOptimize = require('gulp-requirejs-optimize');<% } %>
 var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
+var gutil = require('gulp-util');
 var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
 
