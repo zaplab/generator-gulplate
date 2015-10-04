@@ -21,8 +21,11 @@ var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
 var header = require('gulp-header');<% if (moduleLoader == "requirejs") { %>
 var requirejsOptimize = require('gulp-requirejs-optimize');<% } %>
-var eventStream = require('event-stream');<% if (featureModernizr) { %>
+var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
+var gutil = require('gulp-util');
+var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
+var path = require('path');
 
 var isDevMode = false,
     isServeTask = false,<% if (testMocha) { %>
@@ -74,12 +77,20 @@ function fixPipe(stream) {
 gulp.task('clean', function (cb) {
     del([
         '<%= distributionPath %>/css',
+        '<%= distributionPath %>/fonts',
         '<%= distributionPath %>/img',
         '<%= distributionPath %>/js',
     ], cb);
-});
-<% if (testESLint) { %>
-gulp.task('eslint', function() {
+});<% if (addDocumentation) { %>
+
+gulp.task('clean:doc', function (cb) {
+    del([
+        '<%= documentationPath %>/resources/css/main.css.map',
+        '<%= documentationPath %>/resources/main.js.map',
+    ], cb);
+});<% } %><% if (testESLint) { %>
+
+gulp.task('eslint', function () {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
         .pipe(eslint({
             configFile: '<%= testsPath %>/.eslintrc',
@@ -160,9 +171,26 @@ gulp.task('test-js', [<% if (testESLint) { %>
 gulp.task('test', [<% if (testSassLint) { %>
     'test-css',<% } %>
     'test-js',
-]);
+]);<% if (addDocumentation) { %>
 
-gulp.task('css', ['test-css'], function() {
+gulp.task('jekyll', function (gulpCallBack) {
+    var spawn = require('child_process').spawn;
+    var jekyll = spawn('bundler', [
+        'exec',
+        'jekyll',
+        'build',
+        '--source', '<%= sourcePath %>/jekyll',
+        '--destination', '<%= documentationPath %>',
+    ], {
+        stdio: 'inherit'
+    });
+
+    jekyll.on('exit', function (code) {
+        gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
+    });
+});<% } %>
+
+gulp.task('css', ['test-css'], function () {
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -199,10 +227,9 @@ gulp.task('modernizr', function () {
         .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
 });<% } %>
 
-gulp.task('js', [<% if (testESLint) { %>
-    'eslint',<% } %><% if (addDocumentation && featureModernizr) { %>
-    'modernizr',<% } %>
-], function() {<% if (moduleLoader == "requirejs") { %>
+gulp.task('js', <% if (testESLint) { %>[
+    'eslint',
+], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
     return gulp.src('<%= sourcePath %>/js/main.js')
         .pipe(requirejsOptimize({
             baseUrl: './',
@@ -221,17 +248,28 @@ gulp.task('js', [<% if (testESLint) { %>
         context: './',
         entry: '<%= sourcePath %>/js/main.js',
         output: {
-            path: '<%= distributionPath %>/resources/js/',
+            path: '<%= distributionPath %>/js/',
             filename: 'main.js',
-        },
+        },<% if (jsVersion != "es5") { %>
+        module: {
+            loaders: [
+                {
+                    test: /\.jsx?$/,
+                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                    loader: 'babel',
+                }
+            ]
+        },<% } %>
         resolve: {
             root: './',
-            // Directory names to be searched for modules
             modulesDirectories: [
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
                 'node_modules',
             ]
+        },
+        resolveLoader: {
+            root: path.join(__dirname, 'node_modules')
         },
         plugins: [
             new webpack.ResolverPlugin(
@@ -269,15 +307,12 @@ gulp.task('js', [<% if (testESLint) { %>
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= distributionPath %>/js'))
-        .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.js'
-        })))
         .on('error', function (error) {
             console.error('' + error);
         });<% } %>
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= distributionPath %>/fonts'))
         .on('error', function (error) {
@@ -285,7 +320,7 @@ gulp.task('fonts', function() {
         });
 });
 
-gulp.task('images', function() {
+gulp.task('images', function () {
     return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
         .pipe(imagemin({
             progressive: true,
@@ -300,16 +335,175 @@ gulp.task('images', function() {
         .on('error', function (error) {
             console.error('' + error);
         });
+});<% if (addDocumentation) { %>
+gulp.task('css:doc', ['test-css'], function () {
+    return gulp.src('<%= sourcePath %>/css/main.scss')
+        .pipe(gulpif(isDevMode, sourcemaps.init()))
+        .pipe(sass({
+            outputStyle: 'expanded',
+            includePaths: [
+                '<%= sourcePath %>/libs/bower',
+            ],
+        }))
+        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
+        .pipe(gulpif(!isDevMode, header(banner, {
+            pkg: pkg,
+        })))
+        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/css'))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.css'
+        })))
+        .on('error', function (error) {
+            console.error('' + error);
+        });
+});
+
+gulp.task('js:doc', <% if (testESLint) { %>[
+    'eslint',
+], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
+    return gulp.src('<%= sourcePath %>/js/main.js')
+        .pipe(requirejsOptimize({
+            baseUrl: './',
+            optimize: 'none',
+            mainConfigFile: '<%= sourcePath %>/js/config/requirejs.js',
+            name: '<%= sourcePath %>/js/main.js',
+        }))
+        .pipe(gulpif(!isDevMode, uglify({
+            preserveComments: 'some',
+        })))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
+        .on('error', function (error) {
+            console.error('' + error);
+        });<% } %><% if (moduleLoader == "webpack") { %>
+    var myConfig = {
+        context: './',
+        entry: '<%= sourcePath %>/js/main.js',
+        output: {
+            path: '<%= documentationPath %>/resources/js/',
+            filename: 'main.js',
+        },<% if (jsVersion != "es5") { %>
+        module: {
+            loaders: [
+                {
+                    test: /\.js?$/,
+                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                    loader: 'babel-loader',
+                }
+            ]
+        },<% } %>
+        resolve: {
+            root: './',
+            modulesDirectories: [
+                '<%= sourcePath %>/js',
+                '<%= sourcePath %>/libs/bower',
+                'node_modules',
+            ]
+        },
+        resolveLoader: {
+            root: path.join(__dirname, 'node_modules')
+        },
+        plugins: [
+            new webpack.ResolverPlugin(
+                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
+            )
+        ],
+        devtool: isDevMode ? 'sourcemap' : ''
+    };
+
+    if (!isDevMode) {
+        myConfig.plugins = myConfig.plugins.concat(
+            new webpack.optimize.UglifyJsPlugin()
+        );
+    }
+
+    webpack(myConfig, function (err, stats) {
+        if(err) throw new gutil.PluginError('webpack', err);
+        gutil.log('[webpack]', stats.toString({
+            // output options
+        }));
+        callback();
+    });<% } %><% if (moduleLoader == "none") { %>
+    return gulp.src([
+        '<%= sourcePath %>/js/module-a.js',
+        '<%= sourcePath %>/js/main.js',
+    ])
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        .pipe(babel())<% } %>
+        .pipe(concat('main.js'))
+        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
+        .pipe(gulpif(!isDevMode, header(banner, {
+            pkg: pkg,
+        })))
+        .pipe(gulpif(!isDevMode, uglify({
+            preserveComments: 'some',
+        })))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.js'
+        })))
+        .on('error', function (error) {
+            console.error('' + error);
+        });<% } %>
+});
+
+gulp.task('fonts:doc', function () {
+    return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
+        .pipe(gulp.dest('<%= documentationPath %>/fonts'))
+        .on('error', function (error) {
+            console.error('' + error);
+        });
+});
+
+gulp.task('images:doc', function () {
+    return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{
+                removeViewBox: false,
+            }],
+            use: [
+                pngquant(),
+            ]
+        }))
+        .pipe(gulp.dest('<%= documentationPath %>/img'))
+        .on('error', function (error) {
+            console.error('' + error);
+        });
 });
 
 gulp.task('watch', function () {
-    gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css']);
-    gulp.watch('<%= sourcePath %>/js/**/*.js', ['js']);
-    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images']);
-});<% if (addDocumentation) { %>
+    gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css:doc']);
+    gulp.watch('<%= sourcePath %>/js/**/*.js', ['js:doc']);
+    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images:doc']);
+    gulp.watch('<%= sourcePath %>/jekyll/**/*.html', function () {
+        runSequence(
+            'jekyll',
+            [
+                'css:doc',
+                'js:doc',
+                'images:doc',
+            ]
+        );
+    });
+});
+
+gulp.task('doc', ['clean:doc'], function (cb) {
+    runSequence(
+        'jekyll',
+        [
+            'css:doc',
+            'js:doc',
+            'fonts:doc',
+            'images:doc',
+        ],<% if (featureModernizr) { %>
+        'modernizr',<% } %>
+        cb
+    );
+});
 
 gulp.task('_serve', [
-    'default',
+    'doc',
     'watch',
 ], function () {
     browserSync({
@@ -338,6 +532,7 @@ gulp.task('default', ['clean'], function (cb) {
         [
             'css',
             'js',
+            'fonts',
             'images',
         ],
         cb
