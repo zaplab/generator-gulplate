@@ -501,7 +501,7 @@ module.exports = yeoman.generators.Base.extend({
                         bower: '^1.4.1'
                     },
                     scripts: {
-                        postinstall: 'node_modules/.bin/bower install'
+                        postinstall: 'node_modules/.bin/bower install' + (this.testMocha ? ' && node_modules/.bin/gulp setup' : '')
                     }
                 },
                 gulpModules = {
@@ -529,6 +529,10 @@ module.exports = yeoman.generators.Base.extend({
                 }
             }
 
+            if ((this.moduleLoader == 'none') && (this.jsVersion != 'es5')) {
+                packageJSON.devDependencies['gulp-babel'] = '^5.2.1';
+            }
+
             if (this.testSassLint) {
                 packageJSON.devDependencies['gulp-sass-lint'] = '^1.0.1';
                 packageJSON.sasslintConfig = this.testsPath + '/.sass-lint.yml';
@@ -553,10 +557,11 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.moduleLoader == 'webpack') {
                 if (this.jsVersion !== 'es5') {
+                    packageJSON.devDependencies['babel-core'] = '^5.8.25';
                     packageJSON.devDependencies['babel-loader'] = '^5.3.2';
                 }
 
-                packageJSON.devDependencies['webpack'] = '^1.11.0';
+                packageJSON.devDependencies['webpack'] = '^1.12.2';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
@@ -655,10 +660,6 @@ module.exports = yeoman.generators.Base.extend({
         } else {
             this.installDependencies({
                 callback: function () {
-                    if (this.testMocha) {
-                        this.spawnCommand('./node_modules/gulp/bin/gulp', ['setup']);
-                    }
-
                     if (this.htmlJekyll || this.addDocumentation) {
                         this.spawnCommand('bundler', ['install']);
                     }

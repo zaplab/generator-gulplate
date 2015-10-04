@@ -4,8 +4,8 @@
 var argv = require('yargs').argv;<% if (testMocha) { %>
 var connect = require('gulp-connect');<% } %>
 var del = require('del');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
+var gulp = require('gulp');<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+var babel = require('gulp-babel');<% } %>
 var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
 var sassLint = require('gulp-sass-lint');<% } %>
@@ -22,8 +22,10 @@ var runSequence = require('run-sequence');
 var header = require('gulp-header');<% if (moduleLoader == "requirejs") { %>
 var requirejsOptimize = require('gulp-requirejs-optimize');<% } %>
 var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
+var gutil = require('gulp-util');
 var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
+var path = require('path');
 
 var isDevMode = false,
     isServeTask = false,<% if (testMocha) { %>
@@ -72,21 +74,16 @@ function fixPipe(stream) {
 }
 
 // clear
-gulp.task('clean:end', function (cb) {
-    del([
-        'tmp',
-    ], cb);
-});
-
 gulp.task('clean', function (cb) {
     del([
         '<%= distributionPath %>/resources/css/main.css.map',
+        '<%= distributionPath %>/resources/fonts',
         '<%= distributionPath %>/resources/img',
         '<%= distributionPath %>/resources/js/main.js.map',
     ], cb);
-});
-<% if (testESLint) { %>
-gulp.task('eslint', function() {
+});<% if (testESLint) { %>
+
+gulp.task('eslint', function () {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
         .pipe(eslint({
             configFile: '<%= testsPath %>/.eslintrc',
@@ -95,8 +92,8 @@ gulp.task('eslint', function() {
         .on('error', function (error) {
             console.error('' + error);
         });
-});
-<% } %><% if (testMocha) { %>
+});<% } %><% if (testMocha) { %>
+
 gulp.task('mocha', function () {
     connect.server({
         root: '<%= testsPath %>',
@@ -147,9 +144,9 @@ gulp.task('setup-tests', function (cb) {
 
 gulp.task('setup', [
     'setup-tests',
-]);
-<% } %><% if (testSassLint) { %>
-gulp.task('test-css', function() {
+]);<% } %><% if (testSassLint) { %>
+
+gulp.task('test-css', function () {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(sassLint())
         .pipe(sassLint.format())
@@ -181,12 +178,12 @@ gulp.task('jekyll', function (gulpCallBack) {
         stdio: 'inherit'
     });
 
-    jekyll.on('exit', function(code) {
+    jekyll.on('exit', function (code) {
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
 });<% } %>
 
-gulp.task('css', ['test-css'], function() {
+gulp.task('css', ['test-css'], function () {
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -209,7 +206,7 @@ gulp.task('css', ['test-css'], function() {
         });
 });<% if (featureModernizr) { %>
 
-gulp.task('modernizr', function() {
+gulp.task('modernizr', function () {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',
             '<%= sourcePath %>/js/**/*.js',
@@ -226,10 +223,9 @@ gulp.task('modernizr', function() {
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
 });<% } %>
 
-gulp.task('js', [<% if (testESLint) { %>
-    'eslint',<% } %><% if (featureModernizr) { %>
-    'modernizr',<% } %>
-], function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
+gulp.task('js', <% if (testESLint) { %>[
+    'eslint',
+], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
     return gulp.src('<%= sourcePath %>/js/main.js')
         .pipe(requirejsOptimize({
             baseUrl: './',
@@ -250,15 +246,26 @@ gulp.task('js', [<% if (testESLint) { %>
         output: {
             path: '<%= distributionPath %>/resources/js/',
             filename: 'main.js',
-        },
+        },<% if (jsVersion != "es5") { %>
+        module: {
+            loaders: [
+                {
+                    test: /\.jsx?$/,
+                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                    loader: 'babel',
+                }
+            ]
+        },<% } %>
         resolve: {
             root: './',
-            // Directory names to be searched for modules
             modulesDirectories: [
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
                 'node_modules',
             ]
+        },
+        resolveLoader: {
+            root: path.join(__dirname, 'node_modules')
         },
         plugins: [
             new webpack.ResolverPlugin(
@@ -274,7 +281,7 @@ gulp.task('js', [<% if (testESLint) { %>
         );
     }
 
-    webpack(myConfig, function(err, stats) {
+    webpack(myConfig, function (err, stats) {
         if (err) {
             throw new gutil.PluginError('webpack', err);
         }
@@ -289,7 +296,8 @@ gulp.task('js', [<% if (testESLint) { %>
             '<%= sourcePath %>/js/module-a.js',
             '<%= sourcePath %>/js/main.js',
         ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
@@ -307,7 +315,7 @@ gulp.task('js', [<% if (testESLint) { %>
         });<% } %>
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= distributionPath %>/resources/fonts'))
         .on('error', function (error) {
@@ -315,7 +323,7 @@ gulp.task('fonts', function() {
         });
 });
 
-gulp.task('images', function() {
+gulp.task('images', function () {
     return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
         .pipe(imagemin({
             progressive: true,
@@ -343,8 +351,7 @@ gulp.task('watch', function () {
                 'css',
                 'js',
                 'images',
-            ],
-            'clean:end'
+            ]
         );
     });<% } %>
 });
@@ -371,7 +378,7 @@ gulp.task('serve', function () {
         isDevMode = true;
     }
 
-    gulp.run('_serve');
+    runSequence('_serve');
 });
 
 gulp.task('default', ['clean'], function (cb) {
@@ -380,9 +387,10 @@ gulp.task('default', ['clean'], function (cb) {
         [
             'css',
             'js',
+            'fonts',
             'images',
-        ],
-        'clean:end',
+        ],<% if (featureModernizr) { %>
+        'modernizr',<% } %>
         cb
     );
 });

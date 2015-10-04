@@ -9,4 +9,8 @@ rules:<% if (indentation == 'tabs') { %>
   mixins-before-declarations: 0
   no-color-literals: 0
   no-duplicate-properties: 0
+  nesting-depth:
+      - 2
+      -
+        max-depth: 4
   no-ids: 0
