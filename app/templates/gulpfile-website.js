@@ -221,10 +221,9 @@ gulp.task('modernizr', function () {
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
 });<% } %>
 
-gulp.task('js', [<% if (testESLint) { %>
-    'eslint',<% } %><% if (featureModernizr) { %>
-    'modernizr',<% } %>
-], function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
+gulp.task('js', <% if (testESLint) { %>[
+    'eslint',
+], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
     return gulp.src('<%= sourcePath %>/js/main.js')
         .pipe(requirejsOptimize({
             baseUrl: './',
@@ -375,6 +374,8 @@ gulp.task('default', ['clean'], function (cb) {
             'css',
             'js',
             'images',
+        ],<% if (featureModernizr) { %>
+        'modernizr',<% } %>
         cb
     );
 });
