@@ -73,21 +73,15 @@ function fixPipe(stream) {
 }
 
 // clear
-gulp.task('clean:end', function (cb) {
-    del([
-        'tmp',
-    ], cb);
-});
-
 gulp.task('clean', function (cb) {
     del([
         '<%= distributionPath %>/resources/css/main.css.map',
         '<%= distributionPath %>/resources/img',
         '<%= distributionPath %>/resources/js/main.js.map',
     ], cb);
-});
-<% if (testESLint) { %>
-gulp.task('eslint', function() {
+});<% if (testESLint) { %>
+
+gulp.task('eslint', function () {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
         .pipe(eslint({
             configFile: '<%= testsPath %>/.eslintrc',
@@ -96,8 +90,8 @@ gulp.task('eslint', function() {
         .on('error', function (error) {
             console.error('' + error);
         });
-});
-<% } %><% if (testMocha) { %>
+});<% } %><% if (testMocha) { %>
+
 gulp.task('mocha', function () {
     connect.server({
         root: '<%= testsPath %>',
@@ -148,9 +142,9 @@ gulp.task('setup-tests', function (cb) {
 
 gulp.task('setup', [
     'setup-tests',
-]);
-<% } %><% if (testSassLint) { %>
-gulp.task('test-css', function() {
+]);<% } %><% if (testSassLint) { %>
+
+gulp.task('test-css', function () {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(sassLint())
         .pipe(sassLint.format())
@@ -182,12 +176,12 @@ gulp.task('jekyll', function (gulpCallBack) {
         stdio: 'inherit'
     });
 
-    jekyll.on('exit', function(code) {
+    jekyll.on('exit', function (code) {
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
 });<% } %>
 
-gulp.task('css', ['test-css'], function() {
+gulp.task('css', ['test-css'], function () {
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -210,7 +204,7 @@ gulp.task('css', ['test-css'], function() {
         });
 });<% if (featureModernizr) { %>
 
-gulp.task('modernizr', function() {
+gulp.task('modernizr', function () {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',
             '<%= sourcePath %>/js/**/*.js',
@@ -254,7 +248,6 @@ gulp.task('js', [<% if (testESLint) { %>
         },
         resolve: {
             root: './',
-            // Directory names to be searched for modules
             modulesDirectories: [
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
@@ -275,7 +268,7 @@ gulp.task('js', [<% if (testESLint) { %>
         );
     }
 
-    webpack(myConfig, function(err, stats) {
+    webpack(myConfig, function (err, stats) {
         if (err) {
             throw new gutil.PluginError('webpack', err);
         }
@@ -309,7 +302,7 @@ gulp.task('js', [<% if (testESLint) { %>
         });<% } %>
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= distributionPath %>/resources/fonts'))
         .on('error', function (error) {
@@ -317,7 +310,7 @@ gulp.task('fonts', function() {
         });
 });
 
-gulp.task('images', function() {
+gulp.task('images', function () {
     return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
         .pipe(imagemin({
             progressive: true,
@@ -345,8 +338,7 @@ gulp.task('watch', function () {
                 'css',
                 'js',
                 'images',
-            ],
-            'clean:end'
+            ]
         );
     });<% } %>
 });
@@ -383,8 +375,6 @@ gulp.task('default', ['clean'], function (cb) {
             'css',
             'js',
             'images',
-        ],
-        'clean:end',
         cb
     );
 });

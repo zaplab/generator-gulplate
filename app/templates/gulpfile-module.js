@@ -71,12 +71,6 @@ function fixPipe(stream) {
 }
 
 // clear
-gulp.task('clean:end', function (cb) {
-    del([
-        'tmp',
-    ], cb);
-});
-
 gulp.task('clean', function (cb) {
     del([
         '<%= distributionPath %>/css',
@@ -94,8 +88,8 @@ gulp.task('eslint', function() {
         .on('error', function (error) {
             console.error('' + error);
         });
-});
-<% } %><% if (testMocha) { %>
+});<% } %><% if (testMocha) { %>
+
 gulp.task('mocha', function () {
     connect.server({
         root: '<%= testsPath %>',
@@ -148,7 +142,7 @@ gulp.task('setup', [
     'setup-tests',
 ]);
 <% } %><% if (testSassLint) { %>
-gulp.task('test-css', function() {
+gulp.task('test-css', function () {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(sassLint())
         .pipe(sassLint.format())
@@ -183,15 +177,12 @@ gulp.task('css', ['test-css'], function() {
         })))
         .pipe(gulpif(!isDevMode, cssmin()))
         .pipe(gulp.dest('<%= distributionPath %>/css'))
-        .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.css'
-        })))
         .on('error', function (error) {
             console.error('' + error);
         });
 });<% if (addDocumentation && featureModernizr) { %>
 
-gulp.task('modernizr', function() {
+gulp.task('modernizr', function () {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',
             '<%= sourcePath %>/js/**/*.js',
@@ -256,7 +247,7 @@ gulp.task('js', [<% if (testESLint) { %>
         );
     }
 
-    webpack(myConfig, function(err, stats) {
+    webpack(myConfig, function (err, stats) {
         if(err) throw new gutil.PluginError('webpack', err);
         gutil.log('[webpack]', stats.toString({
             // output options
@@ -349,7 +340,6 @@ gulp.task('default', ['clean'], function (cb) {
             'js',
             'images',
         ],
-        'clean:end',
         cb
     );
 });
