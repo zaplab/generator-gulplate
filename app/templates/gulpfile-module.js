@@ -4,7 +4,8 @@
 var argv = require('yargs').argv;<% if (testMocha) { %>
 var connect = require('gulp-connect');<% } %>
 var del = require('del');
-var gulp = require('gulp');
+var gulp = require('gulp');<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+var babel = require('gulp-babel');<% } %>
 var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
 var sassLint = require('gulp-sass-lint');<% } %>
@@ -266,7 +267,8 @@ gulp.task('js', [<% if (testESLint) { %>
             '<%= sourcePath %>/js/module-a.js',
             '<%= sourcePath %>/js/main.js',
         ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+        .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {

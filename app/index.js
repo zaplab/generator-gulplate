@@ -529,6 +529,10 @@ module.exports = yeoman.generators.Base.extend({
                 }
             }
 
+            if ((this.moduleLoader == 'none') && (this.jsVersion != 'es5')) {
+                packageJSON.devDependencies['gulp-babel'] = '^5.2.1';
+            }
+
             if (this.testSassLint) {
                 packageJSON.devDependencies['gulp-sass-lint'] = '^1.0.1';
                 packageJSON.sasslintConfig = this.testsPath + '/.sass-lint.yml';
