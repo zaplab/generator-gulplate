@@ -482,8 +482,10 @@ gulp.task('watch', function () {
             [
                 'css:doc',
                 'js:doc',
+                'fonts:doc',
                 'images:doc',
-            ]
+            ]<% if (featureModernizr) { %>
+            'modernizr',<% } %>
         );
     });
 });
