@@ -524,7 +524,7 @@ gulp.task('serve', function () {
         isDevMode = true;
     }
 
-    gulp.run('_serve');
+    runSequence('_serve');
 });<% } %>
 
 gulp.task('default', ['clean'], function (cb) {
