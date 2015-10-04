@@ -123,7 +123,6 @@ the following folders / files will be added
 └── package.json
 ```
 
-TODO:
 If you want to add a Documentation for your "Module/Plugin/Library"
 the following folders / files will be added
 
