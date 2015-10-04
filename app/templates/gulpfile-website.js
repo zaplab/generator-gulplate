@@ -77,6 +77,7 @@ function fixPipe(stream) {
 gulp.task('clean', function (cb) {
     del([
         '<%= distributionPath %>/resources/css/main.css.map',
+        '<%= distributionPath %>/resources/fonts',
         '<%= distributionPath %>/resources/img',
         '<%= distributionPath %>/resources/js/main.js.map',
     ], cb);
@@ -386,6 +387,7 @@ gulp.task('default', ['clean'], function (cb) {
         [
             'css',
             'js',
+            'fonts',
             'images',
         ],<% if (featureModernizr) { %>
         'modernizr',<% } %>
