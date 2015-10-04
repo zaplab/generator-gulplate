@@ -208,6 +208,14 @@ gulp.task('css', ['test-css'], function () {
         .on('error', function (error) {
             console.error('' + error);
         });
+});
+
+gulp.task('copy:scss', function () {
+    return gulp.src('<%= sourcePath %>/css/**/*.scss')
+        .pipe(gulp.dest('<%= distributionPath %>/scss'))
+        .on('error', function (error) {
+            console.error('' + error);
+        });
 });<% if (addDocumentation && featureModernizr) { %>
 
 gulp.task('modernizr', function () {
@@ -533,6 +541,7 @@ gulp.task('default', ['clean'], function (cb) {
     runSequence(
         [
             'css',
+            'copy:scss',
             'js',
             'fonts',
             'images',
