@@ -557,10 +557,11 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.moduleLoader == 'webpack') {
                 if (this.jsVersion !== 'es5') {
+                    packageJSON.devDependencies['babel-core'] = '^5.8.25';
                     packageJSON.devDependencies['babel-loader'] = '^5.3.2';
                 }
 
-                packageJSON.devDependencies['webpack'] = '^1.11.0';
+                packageJSON.devDependencies['webpack'] = '^1.12.2';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
