@@ -25,6 +25,7 @@ var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
 var gutil = require('gulp-util');
 var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
+var path = require('path');
 
 var isDevMode = false,
     isServeTask = false,<% if (testMocha) { %>
@@ -244,7 +245,16 @@ gulp.task('js', <% if (testESLint) { %>[
         output: {
             path: '<%= distributionPath %>/resources/js/',
             filename: 'main.js',
-        },
+        },<% if (jsVersion != "es5") { %>
+        module: {
+            loaders: [
+                {
+                    test: /\.jsx?$/,
+                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
+                    loader: 'babel',
+                }
+            ]
+        },<% } %>
         resolve: {
             root: './',
             modulesDirectories: [
@@ -252,6 +262,9 @@ gulp.task('js', <% if (testESLint) { %>[
                 '<%= sourcePath %>/libs/bower',
                 'node_modules',
             ]
+        },
+        resolveLoader: {
+            root: path.join(__dirname, 'node_modules')
         },
         plugins: [
             new webpack.ResolverPlugin(
