@@ -484,8 +484,8 @@ gulp.task('watch', function () {
                 'js:doc',
                 'fonts:doc',
                 'images:doc',
-            ]<% if (featureModernizr) { %>
-            'modernizr',<% } %>
+            ],<% if (featureModernizr) { %>
+            'modernizr'<% } %>
         );
     });
 });
