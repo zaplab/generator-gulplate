@@ -229,9 +229,7 @@ gulp.task('modernizr', function () {
                 'testProp',
             ],
         }))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some'
-        })))
+        .pipe(gulpif(!isDevMode, uglify()))
         .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
 });<% } %>
 
