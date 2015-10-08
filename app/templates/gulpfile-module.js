@@ -431,10 +431,10 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         callback();
     });<% } %><% if (moduleLoader == "none") { %>
     return gulp.src([
-        '<%= sourcePath %>/js/module-a.js',
-        '<%= sourcePath %>/js/main.js',
-    ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+            '<%= sourcePath %>/js/module-a.js',
+            '<%= sourcePath %>/js/main.js',
+        ])
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (jsVersion != "es5") { %>
         .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
