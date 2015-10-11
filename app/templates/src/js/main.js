@@ -1,4 +1,8 @@
+<% if ((moduleLoader == "webpack") && (jsVersion != "es5")) { %>
+import * as moduleA from 'module-a';
 
+console.log('gulplate');
+moduleA.log();<% } else { %>
 // Immediately-Invoked Function Expression
 (function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -27,4 +31,4 @@
 ) {
     console.log('gulplate');
     moduleA.log();
-}));
+}));<% } %>

@@ -501,7 +501,7 @@ module.exports = yeoman.generators.Base.extend({
                         bower: '^1.4.1'
                     },
                     scripts: {
-                        postinstall: 'node_modules/.bin/bower install' + (this.testMocha ? ' && node_modules/.bin/gulp setup' : '')
+                        postinstall: 'node_modules/.bin/bower install'
                     }
                 },
                 gulpModules = {
@@ -571,11 +571,7 @@ module.exports = yeoman.generators.Base.extend({
             if (this.testMocha) {
                 packageJSON.devDependencies['gulp-connect'] = '^2.2.0';
                 packageJSON.devDependencies['gulp-mocha-phantomjs'] = '^0.9.0';
-                packageJSON.scripts.postinstall += ' && node_modules/.bin/gulp setup';
-            }
-
-            if (this.htmlJekyll || this.addDocumentation) {
-                // TODO
+                packageJSON.scripts.postinstall += ' && ./node_modules/.bin/gulp setup';
             }
 
             if (this.featureModernizr) {

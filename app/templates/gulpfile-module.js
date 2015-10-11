@@ -208,6 +208,14 @@ gulp.task('css', ['test-css'], function () {
         .on('error', function (error) {
             console.error('' + error);
         });
+});
+
+gulp.task('copy:scss', function () {
+    return gulp.src('<%= sourcePath %>/css/**/*.scss')
+        .pipe(gulp.dest('<%= distributionPath %>/scss'))
+        .on('error', function (error) {
+            console.error('' + error);
+        });
 });<% if (addDocumentation && featureModernizr) { %>
 
 gulp.task('modernizr', function () {
@@ -221,9 +229,7 @@ gulp.task('modernizr', function () {
                 'testProp',
             ],
         }))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some'
-        })))
+        .pipe(gulpif(!isDevMode, uglify()))
         .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
 });<% } %>
 
@@ -425,10 +431,10 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         callback();
     });<% } %><% if (moduleLoader == "none") { %>
     return gulp.src([
-        '<%= sourcePath %>/js/module-a.js',
-        '<%= sourcePath %>/js/main.js',
-    ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+            '<%= sourcePath %>/js/module-a.js',
+            '<%= sourcePath %>/js/main.js',
+        ])
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (jsVersion != "es5") { %>
         .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
@@ -533,6 +539,7 @@ gulp.task('default', ['clean'], function (cb) {
     runSequence(
         [
             'css',
+            'copy:scss',
             'js',
             'fonts',
             'images',

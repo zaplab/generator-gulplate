@@ -1,4 +1,11 @@
+<% if ((moduleLoader == "webpack") && (jsVersion != "es5")) { %>
+const moduleA = {
+    log: function log() {
+        console.log('module-a');
+    },
+};
 
+export default moduleA;<% } else { %>
 // Immediately-Invoked Function Expression
 (function iife(global, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -18,4 +25,4 @@
             console.log('module-a');
         },
     };
-}));
+}));<% } %>
