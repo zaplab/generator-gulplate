@@ -4,7 +4,7 @@
 var argv = require('yargs').argv;<% if (testMocha) { %>
 var connect = require('gulp-connect');<% } %>
 var del = require('del');
-var gulp = require('gulp');<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
 var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
@@ -244,7 +244,8 @@ gulp.task('js', <% if (testESLint) { %>[
         output: {
             path: '<%= distributionPath %>/resources/js/',
             filename: 'main.js',
-        },<% if (jsVersion != "es5") { %>
+            libraryTarget: 'umd',
+        },
         module: {
             loaders: [
                 {
@@ -253,7 +254,7 @@ gulp.task('js', <% if (testESLint) { %>[
                     loader: 'babel',
                 }
             ]
-        },<% } %>
+        },
         resolve: {
             root: './',
             modulesDirectories: [
@@ -294,8 +295,10 @@ gulp.task('js', <% if (testESLint) { %>[
             '<%= sourcePath %>/js/module-a.js',
             '<%= sourcePath %>/js/main.js',
         ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
-        .pipe(babel())<% } %>
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
+        .pipe(babel({
+            modules: 'umd'
+        }))<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {

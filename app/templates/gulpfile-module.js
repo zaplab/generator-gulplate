@@ -4,7 +4,7 @@
 var argv = require('yargs').argv;<% if (testMocha) { %>
 var connect = require('gulp-connect');<% } %>
 var del = require('del');
-var gulp = require('gulp');<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
+var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
 var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
@@ -235,87 +235,20 @@ gulp.task('modernizr', function () {
 
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
-], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
-    return gulp.src('<%= sourcePath %>/js/main.js')
-        .pipe(requirejsOptimize({
-            baseUrl: './',
-            optimize: 'none',
-            mainConfigFile: '<%= sourcePath %>/js/config/requirejs.js',
-            name: '<%= sourcePath %>/js/main.js',
+], <% } %>function () {
+    return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
+        .pipe(gulpif(isDevMode, sourcemaps.init()))
+        .pipe(babel({
+            modules: 'umd'
         }))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some',
-        })))
-        .pipe(gulp.dest('<%= distributionPath %>/js'))
-        .on('error', function (error) {
-            console.error('' + error);
-        });<% } %><% if (moduleLoader == "webpack") { %>
-    var myConfig = {
-        context: './',
-        entry: '<%= sourcePath %>/js/main.js',
-        output: {
-            path: '<%= distributionPath %>/js/',
-            filename: 'main.js',
-        },<% if (jsVersion != "es5") { %>
-        module: {
-            loaders: [
-                {
-                    test: /\.jsx?$/,
-                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
-                    loader: 'babel',
-                }
-            ]
-        },<% } %>
-        resolve: {
-            root: './',
-            modulesDirectories: [
-                '<%= sourcePath %>/js',
-                '<%= sourcePath %>/libs/bower',
-                'node_modules',
-            ]
-        },
-        resolveLoader: {
-            root: path.join(__dirname, 'node_modules')
-        },
-        plugins: [
-            new webpack.ResolverPlugin(
-                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-            )
-        ],
-        devtool: isDevMode ? 'sourcemap' : ''
-    };
-
-    if (!isDevMode) {
-        myConfig.plugins = myConfig.plugins.concat(
-            new webpack.optimize.UglifyJsPlugin()
-        );
-    }
-
-    webpack(myConfig, function (err, stats) {
-        if(err) throw new gutil.PluginError('webpack', err);
-        gutil.log('[webpack]', stats.toString({
-            // output options
-        }));
-        callback();
-    });<% } %><% if (moduleLoader == "none") { %>
-    return gulp.src([
-            '<%= sourcePath %>/js/module-a.js',
-            '<%= sourcePath %>/js/main.js',
-        ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if ((moduleLoader == "none") && (jsVersion != "es5")) { %>
-        .pipe(babel())<% } %>
-        .pipe(concat('main.js'))
-        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
+        .pipe(gulpif(isDevMode, sourcemaps.write('./')))<% } %>
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some',
-        })))
         .pipe(gulp.dest('<%= distributionPath %>/js'))
         .on('error', function (error) {
             console.error('' + error);
-        });<% } %>
+        });
 });
 
 gulp.task('fonts', function () {
@@ -342,6 +275,7 @@ gulp.task('images', function () {
             console.error('' + error);
         });
 });<% if (addDocumentation) { %>
+
 gulp.task('css:doc', ['test-css'], function () {
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
@@ -388,7 +322,8 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         output: {
             path: '<%= documentationPath %>/resources/js/',
             filename: 'main.js',
-        },<% if (jsVersion != "es5") { %>
+            libraryTarget: 'umd',
+        },
         module: {
             loaders: [
                 {
@@ -397,7 +332,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
                     loader: 'babel-loader',
                 }
             ]
-        },<% } %>
+        },
         resolve: {
             root: './',
             modulesDirectories: [
@@ -434,8 +369,10 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             '<%= sourcePath %>/js/module-a.js',
             '<%= sourcePath %>/js/main.js',
         ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (jsVersion != "es5") { %>
-        .pipe(babel())<% } %>
+        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
+        .pipe(babel({
+            modules: 'umd'
+        }))<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
