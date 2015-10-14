@@ -529,7 +529,11 @@ module.exports = yeoman.generators.Base.extend({
                 }
             }
 
-            if ((this.moduleLoader == 'none') && (this.jsVersion != 'es5')) {
+            if (this.projectType === 'module') {
+                packageJSON.main = this.distributionPath + '/js';
+            }
+
+            if (this.transformJs) {
                 packageJSON.devDependencies['gulp-babel'] = '^5.2.1';
             }
 
