@@ -1,5 +1,5 @@
 {
-    "extends": "<% if (jsVersion === 'es5') { %>eslint-config-airbnb-es5<% } else { %>airbnb/base<% } %>",
+    "extends": "airbnb/base",
     "rules": {
         "indent": [2, <% if (indentation == 'tabs') { %>"tab"<% } else { %><%= indentationSpaces %><% } %>],
         "space-before-function-paren": [2, {

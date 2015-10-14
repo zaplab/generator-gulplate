@@ -179,32 +179,18 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    prompJSVersion: function ()
+    prompTransformJs: function ()
     {
         var done = this.async();
 
         this.prompt({
-            type: 'list',
-            name: 'jsVersion',
-            message: 'JavaScript version',
-            choices: [
-                {
-                    name: 'ES5',
-                    value: 'es5'
-                },
-                {
-                    name: 'ES6',
-                    value: 'es6'
-                }/* TODO: ,
-                 {
-                 name: 'ES7',
-                 value: 'es7'
-                 }*/
-            ],
-            default: 'es6'
+            type: 'confirm',
+            name: 'transformJs',
+            message: 'Transform ES6 to ES5?',
+            default: (this.projectType === 'website') ? true : false
         }, function (answers) {
-            this.jsVersion = answers.jsVersion;
-            this.config.set('jsVersion', this.jsVersion);
+            this.transformJs = answers.transformJs;
+            this.config.set('transformJs', this.transformJs);
 
             done();
         }.bind(this));
@@ -349,38 +335,42 @@ module.exports = yeoman.generators.Base.extend({
 
     promptModuleLoaders: function ()
     {
-        var done = this.async(),
-            prompts = {
-                type: 'list',
-                name: 'module-loader',
-                message: 'Module Loader:',
-                choices: [
-                    {
-                        name: 'None',
-                        value: 'none'
-                    },/*, // TODO
-                    {
-                        name: 'jspm',
-                        value: 'jspm'
-                    },*/
-                    {
-                        name: 'Require.js',
-                        value: 'requirejs'
-                    },
-                    {
-                        name: 'Webpack',
-                        value: 'webpack'
-                    }
-                ],
-                default: 'webpack'
-            };
+        if (this.addDocumentation || (this.projectType === 'website')) {
+            var done = this.async(),
+                prompts = {
+                    type: 'list',
+                    name: 'module-loader',
+                    message: (this.addDocumentation && (this.projectType === 'module')) ? 'Module Loader for Documentation:' : 'Module Loader:',
+                    choices: [
+                        {
+                            name: 'None',
+                            value: 'none'
+                        }, /*, // TODO
+                         {
+                         name: 'jspm',
+                         value: 'jspm'
+                         },*/
+                        {
+                            name: 'Require.js',
+                            value: 'requirejs'
+                        },
+                        {
+                            name: 'Webpack',
+                            value: 'webpack'
+                        }
+                    ],
+                    default: 'webpack'
+                };
 
-        this.prompt(prompts, function (answers) {
-            this.moduleLoader = answers['module-loader'];
-            this.config.set('module-loader', this.moduleLoader);
+            this.prompt(prompts, function (answers) {
+                this.moduleLoader = answers['module-loader'];
+                this.config.set('module-loader', this.moduleLoader);
 
-            done();
-        }.bind(this));
+                done();
+            }.bind(this));
+        } else {
+            this.moduleLoader = 'none';
+        }
     },
 
     promptFeatures: function ()
@@ -499,9 +489,6 @@ module.exports = yeoman.generators.Base.extend({
                     dependencies: {},
                     devDependencies: {
                         bower: '^1.4.1'
-                    },
-                    scripts: {
-                        postinstall: 'node_modules/.bin/bower install'
                     }
                 },
                 gulpModules = {
@@ -545,12 +532,7 @@ module.exports = yeoman.generators.Base.extend({
             if (this.testESLint) {
                 packageJSON.devDependencies['babel-eslint'] = '^4.0.10';
                 packageJSON.devDependencies['eslint-plugin-react'] = '^3.4.2';
-
-                if (this.jsVersion === 'es5') {
-                    packageJSON.devDependencies['eslint-config-airbnb-es5'] = '^1.0.5';
-                } else {
-                    packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
-                }
+                packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
 
                 packageJSON.devDependencies['gulp-eslint'] = '^1.0.0';
             }
@@ -560,11 +542,8 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.moduleLoader == 'webpack') {
-                if (this.jsVersion !== 'es5') {
-                    packageJSON.devDependencies['babel-core'] = '^5.8.25';
-                    packageJSON.devDependencies['babel-loader'] = '^5.3.2';
-                }
-
+                packageJSON.devDependencies['babel-core'] = '^5.8.25';
+                packageJSON.devDependencies['babel-loader'] = '^5.3.2';
                 packageJSON.devDependencies['webpack'] = '^1.12.2';
             }
 
@@ -575,7 +554,9 @@ module.exports = yeoman.generators.Base.extend({
             if (this.testMocha) {
                 packageJSON.devDependencies['gulp-connect'] = '^2.2.0';
                 packageJSON.devDependencies['gulp-mocha-phantomjs'] = '^0.9.0';
-                packageJSON.scripts.postinstall += ' && ./node_modules/.bin/gulp setup';
+                packageJSON.scripts = {
+                    postinstall: './node_modules/.bin/gulp setup'
+                };
             }
 
             if (this.featureModernizr) {
