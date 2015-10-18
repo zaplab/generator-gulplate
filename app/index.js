@@ -517,7 +517,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.projectType === 'module') {
-                packageJSON.main = this.distributionPath + '/js';
+                packageJSON.main = this.distributionPath + '/js/main.js';
             }
 
             if (this.transformJs) {
