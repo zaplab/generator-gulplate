@@ -14,3 +14,5 @@ rules:<% if (indentation == 'tabs') { %>
       -
         max-depth: 4
   no-ids: 0
+  force-element-nesting: 0
+  no-qualifying-elements: 0

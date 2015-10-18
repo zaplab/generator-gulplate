@@ -517,7 +517,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.projectType === 'module') {
-                packageJSON.main = this.distributionPath + '/js';
+                packageJSON.main = this.distributionPath + '/js/main.js';
             }
 
             if (this.transformJs) {
@@ -526,7 +526,6 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.testSassLint) {
                 packageJSON.devDependencies['gulp-sass-lint'] = '^1.0.1';
-                packageJSON.sasslintConfig = this.testsPath + '/.sass-lint.yml';
             }
 
             if (this.testESLint) {

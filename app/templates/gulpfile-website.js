@@ -148,7 +148,11 @@ gulp.task('setup', [
 
 gulp.task('test-css', function () {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
-        .pipe(sassLint())
+        .pipe(sassLint({
+            options: {
+                'config-file': '<%= testsPath %>/.sass-lint.yml',
+            },
+        }))
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
         .on('error', function (error) {
