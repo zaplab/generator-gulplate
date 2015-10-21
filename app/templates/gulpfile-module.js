@@ -396,7 +396,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
 
 gulp.task('fonts:doc', function () {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
-        .pipe(gulp.dest('<%= documentationPath %>/fonts'))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/fonts'))
         .on('error', function (error) {
             console.error('' + error);
         });
@@ -413,7 +413,7 @@ gulp.task('images:doc', function () {
                 pngquant(),
             ]
         }))
-        .pipe(gulp.dest('<%= documentationPath %>/img'))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/img'))
         .on('error', function (error) {
             console.error('' + error);
         });
