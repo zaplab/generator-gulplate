@@ -86,7 +86,7 @@ gulp.task('clean', function (cb) {
 gulp.task('clean:doc', function (cb) {
     del([
         '<%= documentationPath %>/resources/css/main.css.map',
-        '<%= documentationPath %>/resources/main.js.map',
+        '<%= documentationPath %>/resources/js/main.js.map',
     ], cb);
 });<% } %><% if (testESLint) { %>
 
