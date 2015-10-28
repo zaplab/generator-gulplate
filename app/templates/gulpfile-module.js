@@ -27,16 +27,18 @@ var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
 var path = require('path');
 
-var isDevMode = false,
-    isServeTask = false,<% if (testMocha) { %>
-    testServerPort = 8080,<% } %>
-    pkg = require('./package.json'),
-    banner = ['/*!',
+var isDevMode = false;
+var isServeTask = false;<% if (testMocha) { %>
+var testServerPort = 8080;<% } %>
+var pkg = require('./package.json');
+var banner = [
+        '/*!',
         ' <%%= pkg.name %> <%%= pkg.version %>',
         ' Copyright ' + new Date().getFullYear() + ' <%%= pkg.author.name %> (<%%= pkg.author.url %>)',
         ' All rights reserved.',
         ' <%%= pkg.description %>',
-        '*/'].join('\n');
+        '*/'
+    ].join('\n');
 
 switch (argv.target) {
     case 'dev':
