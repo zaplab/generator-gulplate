@@ -327,7 +327,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
     var myConfig = {
-        context: './',
+        context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
             path: '<%= documentationPath %>/resources/js/',

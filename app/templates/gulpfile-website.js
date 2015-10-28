@@ -247,7 +247,7 @@ gulp.task('js', <% if (testESLint) { %>[
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
     var myConfig = {
-        context: './',
+        context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
             path: '<%= distributionPath %>/resources/js/',
