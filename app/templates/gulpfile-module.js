@@ -429,7 +429,9 @@ gulp.task('watch', function () {
     gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css:doc']);
     gulp.watch('<%= sourcePath %>/js/**/*.js', ['js:doc']);
     gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images:doc']);
-    gulp.watch('<%= sourcePath %>/jekyll/**/*.html', function () {
+    gulp.watch('<%= sourcePath %>/doc/css/**/*.scss', ['css:doc']);
+    gulp.watch('<%= sourcePath %>/doc/js/**/*.js', ['js:doc']);
+    gulp.watch('<%= sourcePath %>/doc/jekyll/**/*.html', function () {
         runSequence(
             'jekyll',
             [
