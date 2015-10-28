@@ -27,16 +27,18 @@ var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
 var path = require('path');
 
-var isDevMode = false,
-    isServeTask = false,<% if (testMocha) { %>
-    testServerPort = 8080,<% } %>
-    pkg = require('./package.json'),
-    banner = ['/*!',
+var isDevMode = false;
+var isServeTask = false;<% if (testMocha) { %>
+var testServerPort = 8080;<% } %>
+var pkg = require('./package.json');
+var banner = [
+        '/*!',
         ' <%%= pkg.name %> <%%= pkg.version %>',
         ' Copyright ' + new Date().getFullYear() + ' <%%= pkg.author.name %> (<%%= pkg.author.url %>)',
         ' All rights reserved.',
         ' <%%= pkg.description %>',
-        '*/'].join('\n');
+        '*/'
+    ].join('\n');
 
 switch (argv.target) {
     case 'dev':
@@ -86,7 +88,7 @@ gulp.task('clean', function (cb) {
 gulp.task('clean:doc', function (cb) {
     del([
         '<%= documentationPath %>/resources/css/main.css.map',
-        '<%= documentationPath %>/resources/main.js.map',
+        '<%= documentationPath %>/resources/js/main.js.map',
     ], cb);
 });<% } %><% if (testESLint) { %>
 
@@ -207,7 +209,9 @@ gulp.task('css', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= distributionPath %>/css'))
         .on('error', function (error) {
             console.error('' + error);
@@ -293,7 +297,9 @@ gulp.task('css:doc', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= documentationPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css'
@@ -321,7 +327,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
     var myConfig = {
-        context: './',
+        context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
             path: '<%= documentationPath %>/resources/js/',
@@ -396,7 +402,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
 
 gulp.task('fonts:doc', function () {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
-        .pipe(gulp.dest('<%= documentationPath %>/fonts'))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/fonts'))
         .on('error', function (error) {
             console.error('' + error);
         });
@@ -413,7 +419,7 @@ gulp.task('images:doc', function () {
                 pngquant(),
             ]
         }))
-        .pipe(gulp.dest('<%= documentationPath %>/img'))
+        .pipe(gulp.dest('<%= documentationPath %>/resources/img'))
         .on('error', function (error) {
             console.error('' + error);
         });
@@ -423,7 +429,9 @@ gulp.task('watch', function () {
     gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css:doc']);
     gulp.watch('<%= sourcePath %>/js/**/*.js', ['js:doc']);
     gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images:doc']);
-    gulp.watch('<%= sourcePath %>/jekyll/**/*.html', function () {
+    gulp.watch('<%= sourcePath %>/doc/css/**/*.scss', ['css:doc']);
+    gulp.watch('<%= sourcePath %>/doc/js/**/*.js', ['js:doc']);
+    gulp.watch('<%= sourcePath %>/doc/jekyll/**/*.html', function () {
         runSequence(
             'jekyll',
             [

@@ -27,16 +27,18 @@ var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
 var path = require('path');
 
-var isDevMode = false,
-    isServeTask = false,<% if (testMocha) { %>
-    testServerPort = 8080,<% } %>
-    pkg = require('./package.json'),
-    banner = ['/*!',
+var isDevMode = false;
+var isServeTask = false;<% if (testMocha) { %>
+var testServerPort = 8080;<% } %>
+var pkg = require('./package.json');
+var banner = [
+        '/*!',
         ' <%%= pkg.name %> <%%= pkg.version %>',
         ' Copyright ' + new Date().getFullYear() + ' <%%= pkg.author.name %> (<%%= pkg.author.url %>)',
         ' All rights reserved.',
         ' <%%= pkg.description %>',
-        '*/'].join('\n');
+        '*/'
+    ].join('\n');
 
 switch (argv.target) {
     case 'dev':
@@ -200,7 +202,9 @@ gulp.task('css', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css'
@@ -243,7 +247,7 @@ gulp.task('js', <% if (testESLint) { %>[
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
     var myConfig = {
-        context: './',
+        context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
             path: '<%= distributionPath %>/resources/js/',
