@@ -7,5 +7,6 @@ charset = utf-8
 indent_style = <% if (indentation == 'spaces') { %>space<% } else { %>tab<% } %>
 indent_size = <% if (indentation == 'spaces') { %><%=indentationSpaces %><% } else { %>4<% } %>
 
-[*.json]
+[*.json]<% if (indentation == 'tabs') { %>
+indent_style = space<% } %>
 indent_size = 2
