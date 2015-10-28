@@ -207,7 +207,9 @@ gulp.task('css', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= distributionPath %>/css'))
         .on('error', function (error) {
             console.error('' + error);
@@ -293,7 +295,9 @@ gulp.task('css:doc', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= documentationPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css'

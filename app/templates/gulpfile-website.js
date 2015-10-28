@@ -200,7 +200,9 @@ gulp.task('css', ['test-css'], function () {
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
-        .pipe(gulpif(!isDevMode, cssmin()))
+        .pipe(gulpif(!isDevMode, cssmin({
+            aggressiveMerging: false,
+        })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css'
