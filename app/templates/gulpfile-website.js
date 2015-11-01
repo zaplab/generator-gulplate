@@ -264,7 +264,7 @@ gulp.task('js', <% if (testESLint) { %>[
             ]
         },
         resolve: {
-            root: './',
+            root: __dirname,
             modulesDirectories: [
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',

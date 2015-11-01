@@ -350,7 +350,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             ]
         },
         resolve: {
-            root: './',
+            root: __dirname,
             modulesDirectories: [
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
