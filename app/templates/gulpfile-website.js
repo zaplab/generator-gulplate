@@ -252,7 +252,6 @@ gulp.task('js', <% if (testESLint) { %>[
         output: {
             path: '<%= distributionPath %>/resources/js/',
             filename: 'main.js',
-            libraryTarget: 'umd',
         },
         module: {
             loaders: [
