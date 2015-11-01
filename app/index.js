@@ -588,13 +588,25 @@ module.exports = yeoman.generators.Base.extend({
             }
         },
 
+        doc: function () {
+            if (this.addDocumentation) {
+                this.copy('src/doc/css/main.scss', this.sourcePath + '/doc/css/main.scss');
+                this.copy('src/doc/js/main.js', this.sourcePath + '/doc/js/main.js');
+            }
+        },
+
         jekyll: function () {
+            var extraPath = '';
+
             if (this.htmlJekyll || this.addDocumentation) {
-                this.mkdir(this.sourcePath + '/jekyll');
-                this.copy('src/jekyll/index.html', this.sourcePath + '/jekyll/index.html');
-                this.copy('src/jekyll/_layouts/default.html', this.sourcePath + '/jekyll/_layouts/default.html');
-                this.copy('src/jekyll/_includes/main-navigation.html', this.sourcePath + '/jekyll/_includes/main-navigation.html');
-                this.copy('src/jekyll/_config.yml', this.sourcePath + '/jekyll/_config.yml');
+                if (this.addDocumentation) {
+                    extraPath = '/doc';
+                }
+
+                this.copy('src/jekyll/index.html', this.sourcePath + extraPath + '/jekyll/index.html');
+                this.copy('src/jekyll/_layouts/default.html', this.sourcePath + extraPath + '/jekyll/_layouts/default.html');
+                this.copy('src/jekyll/_includes/main-navigation.html', this.sourcePath + extraPath + '/jekyll/_includes/main-navigation.html');
+                this.copy('src/jekyll/_config.yml', this.sourcePath + extraPath + '/jekyll/_config.yml');
             }
         },
 
@@ -625,7 +637,7 @@ module.exports = yeoman.generators.Base.extend({
     install: function ()
     {
         if (this.options['skip-install']) {
-            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
+            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install');
 
             if (this.testMocha) {
                 installInfo += chalk.yellow.bold('gulp setup');
