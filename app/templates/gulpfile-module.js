@@ -156,7 +156,10 @@ gulp.task('setup', [
 ]);
 <% } %><% if (testSassLint) { %>
 gulp.task('test-css', function () {
-    return gulp.src('<%= sourcePath %>/css/**/*.scss')
+    return gulp.src([
+            '<%= sourcePath %>/css/**/*.scss',<% if (addDocumentation) { %>
+            '<%= sourcePath %>/doc/css/**/*.scss',<% } %>
+        ])
         .pipe(sassLint({
             options: {
                 'config-file': '<%= testsPath %>/.sass-lint.yml',
@@ -185,7 +188,7 @@ gulp.task('jekyll', function (gulpCallBack) {
         'exec',
         'jekyll',
         'build',
-        '--source', '<%= sourcePath %>/jekyll',
+        '--source', '<%= sourcePath %>/doc/jekyll',
         '--destination', '<%= documentationPath %>',
     ], {
         stdio: 'inherit'
@@ -244,7 +247,10 @@ gulp.task('modernizr', function () {
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>function () {
-    return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
+    return gulp.src([
+            '<%= sourcePath %>/js/**/*.js',<% if (addDocumentation) { %>
+            '<%= sourcePath %>/doc/js/**/*.js',<% } %>
+        ])<% if (transformJs) { %>
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(babel({
             modules: 'umd'
@@ -285,7 +291,7 @@ gulp.task('images', function () {
 });<% if (addDocumentation) { %>
 
 gulp.task('css:doc', ['test-css'], function () {
-    return gulp.src('<%= sourcePath %>/css/main.scss')
+    return gulp.src('<%= sourcePath %>/doc/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
             outputStyle: 'expanded',
@@ -328,7 +334,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         });<% } %><% if (moduleLoader == "webpack") { %>
     var myConfig = {
         context: __dirname,
-        entry: '<%= sourcePath %>/js/main.js',
+        entry: '<%= sourcePath %>/doc/js/main.js',
         output: {
             path: '<%= documentationPath %>/resources/js/',
             filename: 'main.js',
