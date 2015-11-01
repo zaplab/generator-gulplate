@@ -637,7 +637,7 @@ module.exports = yeoman.generators.Base.extend({
     install: function ()
     {
         if (this.options['skip-install']) {
-            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install && bower install');
+            var installInfo = 'To install:\n> ' + chalk.yellow.bold('npm install');
 
             if (this.testMocha) {
                 installInfo += chalk.yellow.bold('gulp setup');
