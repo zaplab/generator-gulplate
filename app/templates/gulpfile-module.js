@@ -6,7 +6,12 @@ var connect = require('gulp-connect');<% } %>
 var del = require('del');
 var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
-var gulpif = require('gulp-if');
+var gulpif = require('gulp-if');<% if (htmlMetalsmith || docMetalsmith) { %>
+var metalsmith = require('gulp-metalsmith');
+var metalsmithMarkdown = require('metalsmith-markdown');
+var metalsmithPath = require('metalsmith-path');
+var metalsmithLayouts = require('metalsmith-layouts');
+var handlebars = require('handlebars');<% } %>
 var concat = require('gulp-concat');<% if (testSassLint) { %>
 var sassLint = require('gulp-sass-lint');<% } %>
 var cssmin = require('gulp-cssmin');
@@ -180,15 +185,47 @@ gulp.task('test-js', [<% if (testESLint) { %>
 gulp.task('test', [<% if (testSassLint) { %>
     'test-css',<% } %>
     'test-js',
-]);<% if (addDocumentation) { %>
+]);<% if (addDocumentation) { %><% if (docMetalsmith) { %>
 
-gulp.task('jekyll', function (gulpCallBack) {
+handlebars.registerHelper('if_eq', function(a, b, opts) {
+    if(a == b) // Or === depending on your needs
+        return opts.fn(this);
+    else
+        return opts.inverse(this);
+});
+
+gulp.task('templates', function () {
+    return gulp.src([
+            '<%= sourcePath %>/doc/templates/**/*.html',
+            '!<%= sourcePath %>/doc/templates/_includes/**/*',
+            '!<%= sourcePath %>/doc/templates/_layouts/**/*',
+        ])
+        .pipe(metalsmith({
+            // set Metalsmith's root directory, for example for locating templates, defaults to CWD
+            root: '<%= sourcePath %>/doc/templates',
+            // read frontmatter, defaults to true
+            frontmatter: true,
+            // Metalsmith plugins to use
+            use: [
+                metalsmithMarkdown(),
+                metalsmithPath(),
+                metalsmithLayouts({
+                    'default': 'default.html',
+                    engine: 'handlebars',
+                    directory: '_layouts',
+                    partials: '_includes',
+                }),
+            ]
+        }))
+        .pipe(gulp.dest('<%= documentationPath %>'));
+});<% } %><% if (docJekyll) { %>
+gulp.task('templates', function (gulpCallBack) {
     var spawn = require('child_process').spawn;
     var jekyll = spawn('bundler', [
         'exec',
         'jekyll',
         'build',
-        '--source', '<%= sourcePath %>/doc/jekyll',
+        '--source', '<%= sourcePath %>/doc/templates',
         '--destination', '<%= documentationPath %>',
     ], {
         stdio: 'inherit'
@@ -197,7 +234,7 @@ gulp.task('jekyll', function (gulpCallBack) {
     jekyll.on('exit', function (code) {
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
-});<% } %>
+});<% } %><% } %>
 
 gulp.task('css', ['test-css'], function () {
     return gulp.src('<%= sourcePath %>/css/main.scss')
@@ -436,9 +473,9 @@ gulp.task('watch', function () {
     gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images:doc']);
     gulp.watch('<%= sourcePath %>/doc/css/**/*.scss', ['css:doc']);
     gulp.watch('<%= sourcePath %>/doc/js/**/*.js', ['js:doc']);
-    gulp.watch('<%= sourcePath %>/doc/jekyll/**/*.html', function () {
+    gulp.watch('<%= sourcePath %>/doc/templates/**/*.html', function () {
         runSequence(
-            'jekyll',
+            'templates',
             [
                 'css:doc',
                 'js:doc',
@@ -452,7 +489,7 @@ gulp.task('watch', function () {
 
 gulp.task('doc', ['clean:doc'], function (cb) {
     runSequence(
-        'jekyll',
+        'templates',
         [
             'css:doc',
             'js:doc',
