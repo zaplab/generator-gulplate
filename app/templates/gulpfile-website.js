@@ -407,7 +407,8 @@ gulp.task('watch', function () {
                 'css',
                 'js',
                 'images',
-            ]
+            ],<% if (featureModernizr) { %>
+            'modernizr'<% } %>
         );
     });<% } %>
 });
