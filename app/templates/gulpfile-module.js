@@ -236,7 +236,10 @@ gulp.task('templates', function (gulpCallBack) {
     });
 });<% } %><% } %>
 
-gulp.task('css', ['test-css'], function () {
+gulp.task('css', ['test-css'], function () {<% if (featureAutoprefixer) { %>
+    var postcss = require('gulp-postcss');
+    var autoprefixer = require('autoprefixer');
+<% } %>
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -244,7 +247,14 @@ gulp.task('css', ['test-css'], function () {
             includePaths: [
                 '<%= sourcePath %>/libs/bower',
             ],
-        }))
+        }))<% if (featureAutoprefixer) { %>
+        .pipe(postcss([
+            autoprefixer({
+                browsers: [
+                    'last 2 versions',
+                ],
+            }),
+        ]))<% } %>
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
@@ -327,7 +337,10 @@ gulp.task('images', function () {
         });
 });<% if (addDocumentation) { %>
 
-gulp.task('css:doc', ['test-css'], function () {
+gulp.task('css:doc', ['test-css'], function () {<% if (featureAutoprefixer) { %>
+    var postcss = require('gulp-postcss');
+    var autoprefixer = require('autoprefixer');
+<% } %>
     return gulp.src('<%= sourcePath %>/doc/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -335,7 +348,14 @@ gulp.task('css:doc', ['test-css'], function () {
             includePaths: [
                 '<%= sourcePath %>/libs/bower',
             ],
-        }))
+        }))<% if (featureAutoprefixer) { %>
+        .pipe(postcss([
+            autoprefixer({
+                browsers: [
+                    'last 2 versions',
+                ],
+            }),
+        ]))<% } %>
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,

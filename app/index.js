@@ -424,6 +424,11 @@ module.exports = yeoman.generators.Base.extend({
                 message: 'Extras',
                 choices: [
                     {
+                        name: 'Use Autoprefixer',
+                        value: 'autoprefixer',
+                        checked: true
+                    },
+                    {
                         name: 'Use Modernizr',
                         value: 'modernizr',
                         checked: true
@@ -438,7 +443,9 @@ module.exports = yeoman.generators.Base.extend({
 
         this.prompt(prompts, function (answers) {
             var features = answers.features;
+            this.featureAutoprefixer = hasFeature(features, 'autoprefixer');
             this.featureModernizr = hasFeature(features, 'modernizr');
+            this.config.set('featureAutoprefixer', this.featureAutoprefixer);
             this.config.set('featureModernizr', this.featureModernizr);
 
             done();
@@ -606,6 +613,11 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.scripts = {
                     postinstall: './node_modules/.bin/gulp setup'
                 };
+            }
+
+            if (this.featureAutoprefixer) {
+                packageJSON.devDependencies['autoprefixer'] = '^6.1.0';
+                packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
             if (this.featureModernizr) {
