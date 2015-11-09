@@ -41,8 +41,13 @@ module.exports = yeoman.generators.Base.extend({
             defaults: false
         });
 
+        this.htmlMetalsmith = false;
         this.htmlJekyll = false;
+
         this.addDocumentation = false;
+
+        this.docMetalsmith = false;
+        this.docJekyll = false;
     },
 
     promptProjectName: function ()
@@ -108,15 +113,21 @@ module.exports = yeoman.generators.Base.extend({
                         value: 'basic'
                     },
                     {
-                        name: 'Use Jekyll',
+                        name: 'Use Metalsmith (node)',
+                        value: 'metalsmith'
+                    },
+                    {
+                        name: 'Use Jekyll (ruby)',
                         value: 'jekyll'
                     }
                 ],
                 default: 'basic'
             }, function (answers) {
                 this.htmlBasic = (answers.html === 'basic');
+                this.htmlMetalsmith = (answers.html === 'metalsmith');
                 this.htmlJekyll = (answers.html === 'jekyll');
                 this.config.set('htmlBasic', this.htmlBasic);
+                this.config.set('htmlMetalsmith', this.htmlMetalsmith);
                 this.config.set('htmlJekyll', this.htmlJekyll);
 
                 done();
@@ -240,7 +251,7 @@ module.exports = yeoman.generators.Base.extend({
             this.prompt({
                 type: 'confirm',
                 name: 'documentation',
-                message: 'Add Documentation (Jekyll)',
+                message: 'Add Documentation',
                 default: true
             }, function (answers) {
                 this.addDocumentation = answers.documentation;
@@ -265,6 +276,37 @@ module.exports = yeoman.generators.Base.extend({
                 this.documentationPath = answers['doc-path'];
                 this.documentationPath = this._.slugify(this.documentationPath);
                 this.config.set('docPath', this.documentationPath);
+
+                done();
+            }.bind(this));
+        }
+    },
+
+    promptDocumentationFramework: function ()
+    {
+        if (this.addDocumentation) {
+            var done = this.async();
+
+            this.prompt({
+                type: 'list',
+                name: 'doc-framework',
+                message: 'Documentation Site-Generator',
+                choices: [
+                    {
+                        name: 'Metalsmith (node)',
+                        value: 'metalsmith'
+                    },
+                    {
+                        name: 'Jekyll (ruby)',
+                        value: 'jekyll'
+                    }
+                ],
+                default: 'metalsmith'
+            }, function (answers) {
+                this.docMetalsmith = (answers['doc-framework'] === 'metalsmith');
+                this.docJekyll = (answers['doc-framework'] === 'jekyll');
+                this.config.set('docMetalsmith', this.docMetalsmith);
+                this.config.set('docJekyll', this.docJekyll);
 
                 done();
             }.bind(this));
@@ -382,6 +424,11 @@ module.exports = yeoman.generators.Base.extend({
                 message: 'Extras',
                 choices: [
                     {
+                        name: 'Use Autoprefixer',
+                        value: 'autoprefixer',
+                        checked: true
+                    },
+                    {
                         name: 'Use Modernizr',
                         value: 'modernizr',
                         checked: true
@@ -396,7 +443,9 @@ module.exports = yeoman.generators.Base.extend({
 
         this.prompt(prompts, function (answers) {
             var features = answers.features;
+            this.featureAutoprefixer = hasFeature(features, 'autoprefixer');
             this.featureModernizr = hasFeature(features, 'modernizr');
+            this.config.set('featureAutoprefixer', this.featureAutoprefixer);
             this.config.set('featureModernizr', this.featureModernizr);
 
             done();
@@ -444,7 +493,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         gem: function () {
-            if (this.htmlJekyll || this.addDocumentation) {
+            if (this.htmlJekyll || this.docJekyll) {
                 this.template('Gemfile');
             }
         },
@@ -550,12 +599,25 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['browser-sync'] = '^2.9.3';
             }
 
+            if (this.htmlMetalsmith || this.docMetalsmith) {
+                packageJSON.devDependencies['gulp-metalsmith'] = '0.0.3';
+                packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
+                packageJSON.devDependencies['metalsmith-path'] = '^0.1.0';
+                packageJSON.devDependencies['metalsmith-layouts'] = '^1.4.2';
+                packageJSON.devDependencies['handlebars'] = '^4.0.4';
+            }
+
             if (this.testMocha) {
                 packageJSON.devDependencies['gulp-connect'] = '^2.2.0';
                 packageJSON.devDependencies['gulp-mocha-phantomjs'] = '^0.9.0';
                 packageJSON.scripts = {
                     postinstall: './node_modules/.bin/gulp setup'
                 };
+            }
+
+            if (this.featureAutoprefixer) {
+                packageJSON.devDependencies['autoprefixer'] = '^6.1.0';
+                packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
             if (this.featureModernizr) {
@@ -598,15 +660,23 @@ module.exports = yeoman.generators.Base.extend({
         jekyll: function () {
             var extraPath = '';
 
-            if (this.htmlJekyll || this.addDocumentation) {
+            if (this.htmlMetalsmith || this.htmlJekyll || this.addDocumentation) {
                 if (this.addDocumentation) {
                     extraPath = '/doc';
                 }
 
-                this.copy('src/jekyll/index.html', this.sourcePath + extraPath + '/jekyll/index.html');
-                this.copy('src/jekyll/_layouts/default.html', this.sourcePath + extraPath + '/jekyll/_layouts/default.html');
-                this.copy('src/jekyll/_includes/main-navigation.html', this.sourcePath + extraPath + '/jekyll/_includes/main-navigation.html');
-                this.copy('src/jekyll/_config.yml', this.sourcePath + extraPath + '/jekyll/_config.yml');
+                if (this.htmlMetalsmith || this.docMetalsmith) {
+                    this.copy('src/templates/metalsmith/index.html', this.sourcePath + extraPath + '/templates/index.html');
+                    this.copy('src/templates/metalsmith/subpage.html', this.sourcePath + extraPath + '/templates/subpage.html');
+                    this.copy('src/templates/metalsmith/_layouts/default.html', this.sourcePath + extraPath + '/templates/_layouts/default.html');
+                    this.copy('src/templates/metalsmith/_includes/main-navigation.html', this.sourcePath + extraPath + '/templates/_includes/main-navigation.html');
+                } else if (this.htmlJekyll || this.docJekyll) {
+                    this.copy('src/templates/jekyll/index.html', this.sourcePath + extraPath + '/templates/index.html');
+                    this.copy('src/templates/jekyll/subpage.html', this.sourcePath + extraPath + '/templates/subpage.html');
+                    this.copy('src/templates/jekyll/_layouts/default.html', this.sourcePath + extraPath + '/templates/_layouts/default.html');
+                    this.copy('src/templates/jekyll/_includes/main-navigation.html', this.sourcePath + extraPath + '/templates/_includes/main-navigation.html');
+                    this.copy('src/templates/jekyll/_config.yml', this.sourcePath + extraPath + '/templates/_config.yml');
+                }
             }
         },
 
@@ -643,7 +713,7 @@ module.exports = yeoman.generators.Base.extend({
                 installInfo += chalk.yellow.bold('gulp setup');
             }
 
-            if (this.htmlJekyll || this.addDocumentation) {
+            if (this.htmlJekyll || this.docJekyll) {
                 installInfo += chalk.yellow.bold(' && bundler install');
             }
 
@@ -652,7 +722,7 @@ module.exports = yeoman.generators.Base.extend({
         } else {
             this.installDependencies({
                 callback: function () {
-                    if (this.htmlJekyll || this.addDocumentation) {
+                    if (this.htmlJekyll || this.docJekyll) {
                         this.spawnCommand('bundler', ['install']);
                     }
                 }.bind(this)
