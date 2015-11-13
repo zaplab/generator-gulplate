@@ -135,61 +135,6 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    prompSpacesOrTabs: function ()
-    {
-        var done = this.async();
-
-        this.prompt({
-            type: 'list',
-            name: 'indentation',
-            message: 'Indentation',
-            choices: [
-                {
-                    name: 'Spaces',
-                    value: 'spaces'
-                },
-                {
-                    name: 'Tabs',
-                    value: 'tabs'
-                }
-            ],
-            default: 'spaces'
-        }, function (answers) {
-            this.indentation = answers.indentation;
-            this.config.set('indentation', this.indentation);
-
-            done();
-        }.bind(this));
-    },
-
-    prompSpaces: function ()
-    {
-        if (this.indentation === 'spaces') {
-            var done = this.async();
-
-            this.prompt({
-                type: 'input',
-                name: 'indentationSpaces',
-                message: 'Number of spaces',
-                validate: function (input) {
-                    var numberValue = parseInt(input, 10);
-
-                    if (numberValue >= 0) {
-                        return true;
-                    } else {
-                        return 'You need to provide a number';
-                    }
-                }.bind(this),
-                default: 4
-            }, function (answers) {
-                this.indentationSpaces = answers.indentationSpaces;
-                this.config.set('indentationSpaces', this.indentationSpaces);
-
-                done();
-            }.bind(this));
-        }
-    },
-
     prompTransformJs: function ()
     {
         var done = this.async();
