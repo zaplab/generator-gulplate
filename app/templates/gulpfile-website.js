@@ -204,6 +204,9 @@ gulp.task('templates', function () {
                     engine: 'handlebars',
                     directory: '_layouts',
                     partials: '_includes',
+                    data: {
+                        version: pkg.version,
+                    },
                 }),
             ]
         }))
