@@ -6,12 +6,7 @@ var connect = require('gulp-connect');<% } %>
 var del = require('del');
 var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
-var gulpif = require('gulp-if');<% if (htmlMetalsmith) { %>
-var metalsmith = require('gulp-metalsmith');
-var metalsmithMarkdown = require('metalsmith-markdown');
-var metalsmithPath = require('metalsmith-path');
-var metalsmithLayouts = require('metalsmith-layouts');
-var handlebars = require('handlebars');<% } %>
+var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
 var sassLint = require('gulp-sass-lint');<% } %>
 var cssmin = require('gulp-cssmin');
@@ -104,7 +99,7 @@ gulp.task('eslint', function () {
 gulp.task('mocha', function () {
     connect.server({
         root: '<%= testsPath %>',
-        port: testServerPort
+        port: testServerPort,
     });
 
     gulp.src([
@@ -177,14 +172,20 @@ gulp.task('test', [
     'test-js',
 ]);<% if (htmlMetalsmith) { %>
 
-handlebars.registerHelper('if_eq', function(a, b, opts) {
-    if(a == b) // Or === depending on your needs
-        return opts.fn(this);
-    else
-        return opts.inverse(this);
-});
-
 gulp.task('templates', function () {
+    var metalsmith = require('gulp-metalsmith');
+    var metalsmithMarkdown = require('metalsmith-markdown');
+    var metalsmithPath = require('metalsmith-path');
+    var metalsmithLayouts = require('metalsmith-layouts');
+    var handlebars = require('handlebars');
+
+    handlebars.registerHelper('if_eq', function(a, b, opts) {
+        if(a == b) // Or === depending on your needs
+            return opts.fn(this);
+        else
+            return opts.inverse(this);
+    });
+
     return gulp.src([
             '<%= sourcePath %>/templates/**/*.html',
             '!<%= sourcePath %>/templates/_includes/**/*',
@@ -208,9 +209,12 @@ gulp.task('templates', function () {
                         version: pkg.version,
                     },
                 }),
-            ]
+            ],
         }))
-        .pipe(gulp.dest('<%= distributionPath %>'));
+        .pipe(gulp.dest('<%= distributionPath %>'))
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            stream: true,
+        })));
 });<% } %><% if (htmlJekyll) { %>
 
 gulp.task('templates', function (gulpCallBack) {
@@ -222,10 +226,11 @@ gulp.task('templates', function (gulpCallBack) {
         '--source', '<%= sourcePath %>/templates',
         '--destination', '<%= distributionPath %>',
     ], {
-        stdio: 'inherit'
+        stdio: 'inherit',
     });
 
     jekyll.on('exit', function (code) {
+        browserSync.reload();
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
 });<% } %>
@@ -258,7 +263,7 @@ gulp.task('css', ['test-css'], function () {<% if (featureAutoprefixer) { %>
         })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.css'
+            match: '**/*.css',
         })))
         .on('error', function (error) {
             console.error('' + error);
@@ -291,9 +296,12 @@ gulp.task('js', <% if (testESLint) { %>[
             name: '<%= sourcePath %>/js/main.js',
         }))
         .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some'
+            preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            match: '**/*.js',
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
@@ -310,8 +318,8 @@ gulp.task('js', <% if (testESLint) { %>[
                     test: /\.jsx?$/,
                     exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
                     loader: 'babel',
-                }
-            ]
+                },
+            ],
         },
         resolve: {
             root: __dirname,
@@ -319,17 +327,17 @@ gulp.task('js', <% if (testESLint) { %>[
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
                 'node_modules',
-            ]
+            ],
         },
         resolveLoader: {
-            root: path.join(__dirname, 'node_modules')
+            root: path.join(__dirname, 'node_modules'),
         },
         plugins: [
             new webpack.ResolverPlugin(
                 new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-            )
+            ),
         ],
-        devtool: isDevMode ? 'sourcemap' : ''
+        devtool: isDevMode ? 'sourcemap' : '',
     };
 
     if (!isDevMode) {
@@ -347,6 +355,10 @@ gulp.task('js', <% if (testESLint) { %>[
             // output options
         }));
 
+        browserSync.reload({
+            match: '**/*.js',
+        });
+
         callback();
     });<% } %><% if (moduleLoader == "none") { %>
     return gulp.src([
@@ -355,7 +367,7 @@ gulp.task('js', <% if (testESLint) { %>[
         ])
         .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
         .pipe(babel({
-            modules: 'umd'
+            modules: 'umd',
         }))<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
@@ -366,8 +378,8 @@ gulp.task('js', <% if (testESLint) { %>[
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
-        .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.js'
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            match: '**/*.js',
         })))
         .on('error', function (error) {
             console.error('' + error);
@@ -391,9 +403,12 @@ gulp.task('images', function () {
             }],
             use: [
                 pngquant(),
-            ]
+            ],
         }))
         .pipe(gulp.dest('<%= distributionPath %>/resources/img'))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.{gif,jpg,png,svg}'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });
@@ -409,8 +424,9 @@ gulp.task('watch', function () {
             [
                 'css',
                 'js',
+                'fonts',
                 'images',
-            ],<% if (featureModernizr) { %>
+            ]<% if (featureModernizr) { %>,
             'modernizr'<% } %>
         );
     });<% } %>
@@ -425,10 +441,6 @@ gulp.task('_serve', [
             baseDir: '<%= distributionPath %>'
         }
     });
-
-    gulp.watch('<%= distributionPath %>/**/*.html', browserSync.reload);
-    gulp.watch('<%= distributionPath %>/resources/js/**/*.js', browserSync.reload);
-    gulp.watch('<%= distributionPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSync.reload);
 });
 
 gulp.task('serve', function () {

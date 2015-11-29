@@ -6,12 +6,7 @@ var connect = require('gulp-connect');<% } %>
 var del = require('del');
 var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
-var gulpif = require('gulp-if');<% if (htmlMetalsmith || docMetalsmith) { %>
-var metalsmith = require('gulp-metalsmith');
-var metalsmithMarkdown = require('metalsmith-markdown');
-var metalsmithPath = require('metalsmith-path');
-var metalsmithLayouts = require('metalsmith-layouts');
-var handlebars = require('handlebars');<% } %>
+var gulpif = require('gulp-if');
 var concat = require('gulp-concat');<% if (testSassLint) { %>
 var sassLint = require('gulp-sass-lint');<% } %>
 var cssmin = require('gulp-cssmin');
@@ -187,14 +182,20 @@ gulp.task('test', [<% if (testSassLint) { %>
     'test-js',
 ]);<% if (addDocumentation) { %><% if (docMetalsmith) { %>
 
-handlebars.registerHelper('if_eq', function(a, b, opts) {
-    if(a == b) // Or === depending on your needs
-        return opts.fn(this);
-    else
-        return opts.inverse(this);
-});
-
 gulp.task('templates', function () {
+    var metalsmith = require('gulp-metalsmith');
+    var metalsmithMarkdown = require('metalsmith-markdown');
+    var metalsmithPath = require('metalsmith-path');
+    var metalsmithLayouts = require('metalsmith-layouts');
+    var handlebars = require('handlebars');
+
+    handlebars.registerHelper('if_eq', function(a, b, opts) {
+        if(a == b) // Or === depending on your needs
+            return opts.fn(this);
+        else
+            return opts.inverse(this);
+    });
+
     return gulp.src([
             '<%= sourcePath %>/doc/templates/**/*.html',
             '!<%= sourcePath %>/doc/templates/_includes/**/*',
@@ -218,9 +219,12 @@ gulp.task('templates', function () {
                         version: pkg.version,
                     },
                 }),
-            ]
+            ],
         }))
-        .pipe(gulp.dest('<%= documentationPath %>'));
+        .pipe(gulp.dest('<%= documentationPath %>'))
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            stream: true,
+        })));
 });<% } %><% if (docJekyll) { %>
 gulp.task('templates', function (gulpCallBack) {
     var spawn = require('child_process').spawn;
@@ -231,10 +235,11 @@ gulp.task('templates', function (gulpCallBack) {
         '--source', '<%= sourcePath %>/doc/templates',
         '--destination', '<%= documentationPath %>',
     ], {
-        stdio: 'inherit'
+        stdio: 'inherit',
     });
 
     jekyll.on('exit', function (code) {
+        browserSync.reload();
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
 });<% } %><% } %>
@@ -297,13 +302,10 @@ gulp.task('modernizr', function () {
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>function () {
-    return gulp.src([
-            '<%= sourcePath %>/js/**/*.js',<% if (addDocumentation) { %>
-            '<%= sourcePath %>/doc/js/**/*.js',<% } %>
-        ])<% if (transformJs) { %>
+    return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(babel({
-            modules: 'umd'
+            modules: 'umd',
         }))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))<% } %>
         .pipe(gulpif(!isDevMode, header(banner, {
@@ -332,7 +334,7 @@ gulp.task('images', function () {
             }],
             use: [
                 pngquant(),
-            ]
+            ],
         }))
         .pipe(gulp.dest('<%= distributionPath %>/img'))
         .on('error', function (error) {
@@ -368,7 +370,7 @@ gulp.task('css:doc', ['test-css'], function () {<% if (featureAutoprefixer) { %>
         })))
         .pipe(gulp.dest('<%= documentationPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.css'
+            match: '**/*.css',
         })))
         .on('error', function (error) {
             console.error('' + error);
@@ -389,6 +391,9 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            match: '**/*.js'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });<% } %><% if (moduleLoader == "webpack") { %>
@@ -405,8 +410,8 @@ gulp.task('js:doc', <% if (testESLint) { %>[
                     test: /\.js?$/,
                     exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
                     loader: 'babel-loader',
-                }
-            ]
+                },
+            ],
         },
         resolve: {
             root: __dirname,
@@ -414,17 +419,17 @@ gulp.task('js:doc', <% if (testESLint) { %>[
                 '<%= sourcePath %>/js',
                 '<%= sourcePath %>/libs/bower',
                 'node_modules',
-            ]
+            ],
         },
         resolveLoader: {
-            root: path.join(__dirname, 'node_modules')
+            root: path.join(__dirname, 'node_modules'),
         },
         plugins: [
             new webpack.ResolverPlugin(
                 new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-            )
+            ),
         ],
-        devtool: isDevMode ? 'sourcemap' : ''
+        devtool: isDevMode ? 'sourcemap' : '',
     };
 
     if (!isDevMode) {
@@ -435,9 +440,15 @@ gulp.task('js:doc', <% if (testESLint) { %>[
 
     webpack(myConfig, function (err, stats) {
         if(err) throw new gutil.PluginError('webpack', err);
+
         gutil.log('[webpack]', stats.toString({
             // output options
         }));
+
+        browserSync.reload({
+            match: '**/*.js',
+        });
+
         callback();
     });<% } %><% if (moduleLoader == "none") { %>
     return gulp.src([
@@ -446,7 +457,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         ])
         .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
         .pipe(babel({
-            modules: 'umd'
+            modules: 'umd',
         }))<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
@@ -457,8 +468,8 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             preserveComments: 'some',
         })))
         .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
-        .pipe(gulpif(isServeTask, browserSync.stream({
-            match: '**/*.js'
+        .pipe(gulpif(isServeTask, browserSync.reload({
+            match: '**/*.js',
         })))
         .on('error', function (error) {
             console.error('' + error);
@@ -482,20 +493,30 @@ gulp.task('images:doc', function () {
             }],
             use: [
                 pngquant(),
-            ]
+            ],
         }))
         .pipe(gulp.dest('<%= documentationPath %>/resources/img'))
+        .pipe(gulpif(isServeTask, browserSync.stream({
+            match: '**/*.{gif,jpg,png,svg}'
+        })))
         .on('error', function (error) {
             console.error('' + error);
         });
 });
 
 gulp.task('watch', function () {
-    gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css:doc']);
-    gulp.watch('<%= sourcePath %>/js/**/*.js', ['js:doc']);
-    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images:doc']);
-    gulp.watch('<%= sourcePath %>/doc/css/**/*.scss', ['css:doc']);
-    gulp.watch('<%= sourcePath %>/doc/js/**/*.js', ['js:doc']);
+    gulp.watch([
+        '<%= sourcePath %>/css/**/*.scss',
+        '<%= sourcePath %>/doc/css/**/*.scss',
+    ], ['css:doc']);
+    gulp.watch([
+        '<%= sourcePath %>/js/**/*.js',
+        '<%= sourcePath %>/doc/js/**/*.js',
+    ], ['js:doc']);
+    gulp.watch([
+        '<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}',
+        '<%= sourcePath %>/doc/img/**/*.{gif,jpg,png,svg}',
+    ], ['images:doc']);
     gulp.watch('<%= sourcePath %>/doc/templates/**/*.html', function () {
         runSequence(
             'templates',
@@ -504,7 +525,7 @@ gulp.task('watch', function () {
                 'js:doc',
                 'fonts:doc',
                 'images:doc',
-            ],<% if (featureModernizr) { %>
+            ]<% if (featureModernizr) { %>,
             'modernizr'<% } %>
         );
     });
@@ -533,10 +554,6 @@ gulp.task('_serve', [
             baseDir: '<%= documentationPath %>'
         }
     });
-
-    gulp.watch('<%= documentationPath %>/**/*.html', browserSync.reload);
-    gulp.watch('<%= documentationPath %>/resources/js/**/*.js', browserSync.reload);
-    gulp.watch('<%= documentationPath %>/resources/img/**/*.{gif,jpg,png,svg}', browserSync.reload);
 });
 
 gulp.task('serve', function () {
