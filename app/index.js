@@ -469,21 +469,21 @@ module.exports = yeoman.generators.Base.extend({
                     }
                 },
                 gulpModules = {
-                    del: '^1.2.0',
-                    'event-stream': '^3.3.1',
+                    del: '^2.2.0',
+                    'event-stream': '^3.3.2',
                     gulp: '^3.9.0',
-                    'gulp-util': '^3.0.6',
+                    'gulp-util': '^3.0.7',
                     'gulp-concat': '^2.6.0',
                     'gulp-cssmin': '^0.1.7',
-                    'gulp-header': '^1.2.2',
-                    'gulp-if': '^1.2.5',
-                    'gulp-imagemin': '^2.3.0',
-                    'gulp-sass': '^2.0.3',
-                    'gulp-sourcemaps': '^1.5.2',
-                    'gulp-uglify': '^1.2.0',
-                    'imagemin-pngquant': '^4.1.0',
-                    'run-sequence': '^1.1.1',
-                    yargs: '^3.14.0'
+                    'gulp-header': '^1.7.1',
+                    'gulp-if': '^2.0.0',
+                    'gulp-imagemin': '^2.4.0',
+                    'gulp-sass': '^2.1.0',
+                    'gulp-sourcemaps': '^1.6.0',
+                    'gulp-uglify': '^1.5.1',
+                    'imagemin-pngquant': '^4.2.0',
+                    'run-sequence': '^1.1.5',
+                    yargs: '^3.31.0'
                 },
                 key;
 
@@ -498,29 +498,29 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.transformJs) {
-                packageJSON.devDependencies['gulp-babel'] = '^5.2.1';
+                packageJSON.devDependencies['gulp-babel'] = '^6.1.1';
             }
 
             if (this.testSassLint) {
-                packageJSON.devDependencies['gulp-sass-lint'] = '^1.0.1';
+                packageJSON.devDependencies['gulp-sass-lint'] = '^1.1.0';
             }
 
             if (this.testESLint) {
-                packageJSON.devDependencies['babel-eslint'] = '^4.0.10';
-                packageJSON.devDependencies['eslint-plugin-react'] = '^3.4.2';
-                packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
+                packageJSON.devDependencies['babel-eslint'] = '^4.1.6';
+                packageJSON.devDependencies['eslint-plugin-react'] = '^3.11.3';
+                packageJSON.devDependencies['eslint-config-airbnb'] = '^2.0.0';
 
-                packageJSON.devDependencies['gulp-eslint'] = '^1.0.0';
+                packageJSON.devDependencies['gulp-eslint'] = '^1.1.1';
             }
 
             if (this.moduleLoader == 'webpack') {
-                packageJSON.devDependencies['babel-core'] = '^5.8.25';
-                packageJSON.devDependencies['babel-loader'] = '^5.3.2';
-                packageJSON.devDependencies['webpack'] = '^1.12.2';
+                packageJSON.devDependencies['babel-core'] = '^6.3.13';
+                packageJSON.devDependencies['babel-loader'] = '^6.2.0';
+                packageJSON.devDependencies['webpack'] = '^1.12.9';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
-                packageJSON.devDependencies['browser-sync'] = '^2.9.3';
+                packageJSON.devDependencies['browser-sync'] = '^2.10.0';
             }
 
             if (this.htmlMetalsmith || this.docMetalsmith) {
@@ -528,7 +528,7 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
                 packageJSON.devDependencies['metalsmith-path'] = '^0.1.0';
                 packageJSON.devDependencies['metalsmith-layouts'] = '^1.4.2';
-                packageJSON.devDependencies['handlebars'] = '^4.0.4';
+                packageJSON.devDependencies['handlebars'] = '^4.0.5';
             }
 
             if (this.testMocha) {
@@ -540,7 +540,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.featureAutoprefixer) {
-                packageJSON.devDependencies['autoprefixer'] = '^6.1.0';
+                packageJSON.devDependencies['autoprefixer'] = '^6.1.2';
                 packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
