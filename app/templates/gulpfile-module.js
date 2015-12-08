@@ -185,11 +185,12 @@ gulp.task('templates', function () {
     var metalsmithLayouts = require('metalsmith-layouts');
     var handlebars = require('handlebars');
 
-    handlebars.registerHelper('if_eq', function(a, b, opts) {
-        if(a == b) // Or === depending on your needs
+    handlebars.registerHelper('if_eq', function (a, b, opts) {
+        if (a == b) {
             return opts.fn(this);
-        else
+        } else {
             return opts.inverse(this);
+        }
     });
 
     return gulp.src([
