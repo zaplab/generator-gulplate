@@ -332,14 +332,6 @@ module.exports = yeoman.generators.Base.extend({
                         {
                             name: 'None',
                             value: 'none'
-                        }, /*, // TODO
-                         {
-                         name: 'jspm',
-                         value: 'jspm'
-                         },*/
-                        {
-                            name: 'Require.js',
-                            value: 'requirejs'
                         },
                         {
                             name: 'Webpack',
@@ -410,10 +402,6 @@ module.exports = yeoman.generators.Base.extend({
                 devDependencies: {}
             };
 
-            if (this.moduleLoader == 'requirejs') {
-                bower.dependencies.requirejs = '^2.1.15';
-            }
-
             if (this.testMocha) {
                 bower.devDependencies.chai = '^1.10.0';
                 bower.devDependencies.mocha = '^2.1.0';
@@ -462,11 +450,6 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         modules: function () {
-            if (this.moduleLoader == 'requirejs') {
-                this.mkdir(this.sourcePath + '/js/config');
-                this.copy('src/js/config/requirejs.js', this.sourcePath + '/js/config/requirejs.js');
-            }
-
             this.copy('src/js/module-a.js', this.sourcePath + '/js/module-a.js');
         },
 
@@ -528,10 +511,6 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
 
                 packageJSON.devDependencies['gulp-eslint'] = '^1.0.0';
-            }
-
-            if (this.moduleLoader == 'requirejs') {
-                packageJSON.devDependencies['gulp-requirejs-optimize'] = '^0.1.3';
             }
 
             if (this.moduleLoader == 'webpack') {
@@ -629,22 +608,6 @@ module.exports = yeoman.generators.Base.extend({
             if (this.testMocha) {
                 this.mkdir(this.testsPath + '/unit');
                 this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-
-                if (this.moduleLoader == 'requirejs') {
-                    this.mkdir(this.testsPath + '/unit/requirejs');
-                    this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
-                    this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
-                    this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-
-                    if (this.projectType === 'website') {
-                        this.copy('tests/index-requirejs.html', this.testsPath + '/index.html');
-                    } else {
-                        this.copy('tests/index.html', this.testsPath + '/index.html');
-                        this.copy('tests/index-requirejs.html', this.testsPath + '/index-requirejs.html');
-                    }
-                } else {
-                    this.copy('tests/index.html', this.testsPath + '/index.html');
-                }
             }
         }
     },

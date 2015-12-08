@@ -19,8 +19,7 @@ var sourcemaps = require('gulp-sourcemaps');<% if (testMocha) { %>
 var mochaPhantomJS = require('gulp-mocha-phantomjs');<% } %>
 var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
-var header = require('gulp-header');<% if (moduleLoader == "requirejs") { %>
-var requirejsOptimize = require('gulp-requirejs-optimize');<% } %>
+var header = require('gulp-header');
 var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
 var gutil = require('gulp-util');
 var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
@@ -137,10 +136,7 @@ gulp.task('setup-tests', function (cb) {
             .pipe(gulp.dest('<%= testsPath %>/libs')),
         // chai
         gulp.src('<%= sourcePath %>/libs/bower/chai/chai.js')
-            .pipe(gulp.dest('<%= testsPath %>/libs'))<% if (moduleLoader == "requirejs") { %>,
-        // requirejs
-        gulp.src('<%= sourcePath %>/libs/bower/requirejs/require.js')
-            .pipe(gulp.dest('<%= testsPath %>/libs'))<% } %>
+            .pipe(gulp.dest('<%= testsPath %>/libs'))
     ).on('end', cb);
 });
 
@@ -287,25 +283,7 @@ gulp.task('modernizr', function () {
 
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
-], <% } %>function (<% if (moduleLoader == "webpack") { %>callback<% } %>) {<% if (moduleLoader == "requirejs") { %>
-    return gulp.src('<%= sourcePath %>/js/main.js')
-        .pipe(requirejsOptimize({
-            baseUrl: './',
-            optimize: 'none',
-            mainConfigFile: '<%= sourcePath %>/js/config/requirejs.js',
-            name: '<%= sourcePath %>/js/main.js',
-        }))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some',
-        })))
-        .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
-        .pipe(gulpif(isServeTask, browserSync.reload({
-            match: '**/*.js',
-        })))
-        .on('error', function (error) {
-            console.error('' + error);
-        });<% } %><% if (moduleLoader == "webpack") { %>
-    var myConfig = {
+], <% } %>function (<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) {<% if (moduleLoader == "webpack") { %>
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
