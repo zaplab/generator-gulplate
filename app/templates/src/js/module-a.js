@@ -1,8 +1,7 @@
 
-const moduleA = {
-    log: function log() {
-        console.log('module-a');
-    },
+export default {
+    /**
+     * @returns {String}
+     */
+    hello: () => 'whazap?',
 };
-
-export default moduleA;

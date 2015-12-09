@@ -1,8 +1,7 @@
 
 'use strict';
 
-var argv = require('yargs').argv;<% if (testMocha) { %>
-var connect = require('gulp-connect');<% } %>
+var argv = require('yargs').argv;
 var del = require('del');
 var gulp = require('gulp');<% if (transformJs) { %>
 var babel = require('gulp-babel');<% } %>
@@ -15,20 +14,18 @@ var pngquant = require('imagemin-pngquant');<% if (testESLint) { %>
 var eslint = require('gulp-eslint');<% } %>
 var uglify = require('gulp-uglify');
 var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');<% if (testMocha) { %>
-var mochaPhantomJS = require('gulp-mocha-phantomjs');<% } %>
+var sourcemaps = require('gulp-sourcemaps');
 var browserSync = require('browser-sync');
 var runSequence = require('run-sequence');
 var header = require('gulp-header');
-var eventStream = require('event-stream');<% if (moduleLoader == "webpack") { %>
+var eventStream = require('event-stream');<% if ((moduleLoader == "webpack") || testKarma) { %>
 var gutil = require('gulp-util');
 var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
 var modernizr = require('gulp-modernizr');<% } %>
 var path = require('path');
 
 var isDevMode = false;
-var isServeTask = false;<% if (testMocha) { %>
-var testServerPort = 8080;<% } %>
+var isServeTask = false;
 var pkg = require('./package.json');
 var banner = [
         '/*!',
@@ -93,49 +90,62 @@ gulp.task('eslint', function () {
         .on('error', function (error) {
             console.error('' + error);
         });
-});<% } %><% if (testMocha) { %>
+});<% } %><% if (testKarma) { %>
 
-gulp.task('mocha', function () {
-    connect.server({
-        root: '<%= testsPath %>',
-        port: testServerPort,
+// for easier debugging of the generated spec bundle
+gulp.task('specs:debug', function (gulpCallback) {
+    let webpackConfig = Object.assign({}, require('./webpack-karma.config.js'), {
+        context: __dirname,
+        entry: '<%= testsPath %>/spec/main.js',
+        output: {
+            path: '<%= testsPath %>/spec-debug/',
+            filename: 'bundle.js',
+        }
     });
 
-    gulp.src([
-            '<%= sourcePath %>/js/module-a.js',
-            '<%= sourcePath %>/js/main.js',
-        ])
-        .pipe(concat('main.js'))
-        .pipe(gulp.dest('<%= testsPath %>/dist/js'));
+    webpack(webpackConfig, function (err, stats) {
+        if (err) {
+            throw new gutil.PluginError('webpack', err);
+        }
 
-    var stream = mochaPhantomJS();
-    stream.write({
-        path: 'http://localhost:' + testServerPort + '/index.html',
-        reporter: 'spec',
+        gutil.log('[webpack]', stats.toString({
+            // output options
+        }));
+
+        browserSync.reload({
+            match: '**/*.js',
+        });
+
+        gulpCallback();
     });
-    stream.end();
+});
 
-    stream.on('end', function () {
-        connect.serverClose();
+gulp.task('specs', done => {
+    let KarmaServer = require('karma').Server;
+
+    new KarmaServer.start({
+        configFile: __dirname + '/karma.config.js',
+        singleRun: true,
+    }, function() {
+        done();
     });
-
-    stream.on('error', function (error) {
-        connect.serverClose();
-    });
-
-    return stream;
 });
 
 gulp.task('setup-tests', function (cb) {
     eventStream.concat(
-        // mocha
+        // jasmine
         gulp.src([
-                '<%= sourcePath %>/libs/bower/mocha/mocha.css',
-                '<%= sourcePath %>/libs/bower/mocha/mocha.js',
+                'node_modules/jasmine-core/lib/jasmine-core/jasmine.css',
+                'node_modules/jasmine-core/lib/jasmine-core/boot.js',
+                'node_modules/jasmine-core/lib/jasmine-core/jasmine.js',
+                'node_modules/jasmine-core/lib/jasmine-core/jasmine-html.js',
             ])
             .pipe(gulp.dest('<%= testsPath %>/libs')),
-        // chai
-        gulp.src('<%= sourcePath %>/libs/bower/chai/chai.js')
+        // jasmine-expect
+        gulp.src('node_modules/jasmine-expect/dist/jasmine-matchers.js')
+            .pipe(gulp.dest('<%= testsPath %>/libs')),
+        // es5-shim
+        gulp.src('node_modules/es5-shim/es5-shim.js')
             .pipe(gulp.dest('<%= testsPath %>/libs'))
     ).on('end', cb);
 });
@@ -159,8 +169,8 @@ gulp.task('test-css', function () {
 });<% } %>
 
 gulp.task('test-js', [<% if (testESLint) { %>
-    'eslint',<% } %><% if (testMocha) { %>
-    'mocha',<% } %>
+    'eslint',<% } %><% if (testKarma) { %>
+    'specs',<% } %>
 ]);
 
 gulp.task('test', [
