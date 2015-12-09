@@ -1,33 +1,31 @@
 
-'use strict';
+const argv = require('yargs').argv;
+const del = require('del');
+const gulp = require('gulp');<% if (transformJs) { %>
+const babel = require('gulp-babel');<% } %>
+const gulpif = require('gulp-if');
+const concat = require('gulp-concat');<% if (testSassLint) { %>
+const sassLint = require('gulp-sass-lint');<% } %>
+const cssmin = require('gulp-cssmin');
+const imagemin = require('gulp-imagemin');
+const pngquant = require('imagemin-pngquant');<% if (testESLint) { %>
+const eslint = require('gulp-eslint');<% } %>
+const uglify = require('gulp-uglify');
+const sass = require('gulp-sass');
+const sourcemaps = require('gulp-sourcemaps');
+const browserSync = require('browser-sync');
+const runSequence = require('run-sequence');
+const header = require('gulp-header');
+const eventStream = require('event-stream');<% if ((moduleLoader == "webpack") || testKarma) { %>
+const gutil = require('gulp-util');
+const webpack = require('webpack');<% } %><% if (featureModernizr) { %>
+const modernizr = require('gulp-modernizr');<% } %>
+const path = require('path');
 
-var argv = require('yargs').argv;
-var del = require('del');
-var gulp = require('gulp');<% if (transformJs) { %>
-var babel = require('gulp-babel');<% } %>
-var gulpif = require('gulp-if');
-var concat = require('gulp-concat');<% if (testSassLint) { %>
-var sassLint = require('gulp-sass-lint');<% } %>
-var cssmin = require('gulp-cssmin');
-var imagemin = require('gulp-imagemin');
-var pngquant = require('imagemin-pngquant');<% if (testESLint) { %>
-var eslint = require('gulp-eslint');<% } %>
-var uglify = require('gulp-uglify');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var browserSync = require('browser-sync');
-var runSequence = require('run-sequence');
-var header = require('gulp-header');
-var eventStream = require('event-stream');<% if ((moduleLoader == "webpack") || testKarma) { %>
-var gutil = require('gulp-util');
-var webpack = require('webpack');<% } %><% if (featureModernizr) { %>
-var modernizr = require('gulp-modernizr');<% } %>
-var path = require('path');
-
-var isDevMode = false;
-var isServeTask = false;
-var pkg = require('./package.json');
-var banner = [
+let isDevMode = false;
+let isServeTask = false;
+let pkg = require('./package.json');
+const banner = [
         '/*!',
         ' <%%= pkg.name %> <%%= pkg.version %>',
         ' Copyright ' + new Date().getFullYear() + ' <%%= pkg.author.name %> (<%%= pkg.author.url %>)',
@@ -72,35 +70,35 @@ function fixPipe(stream) {
 }
 
 // clear
-gulp.task('clean', function (cb) {
+gulp.task('clean', gulpCallback => {
     del([
         '<%= distributionPath %>/css',
         '<%= distributionPath %>/fonts',
         '<%= distributionPath %>/img',
         '<%= distributionPath %>/js',
-    ], cb);
+    ], gulpCallback);
 });<% if (addDocumentation) { %>
 
-gulp.task('clean:doc', function (cb) {
+gulp.task('clean:doc', gulpCallback => {
     del([
         '<%= documentationPath %>/resources/css/main.css.map',
         '<%= documentationPath %>/resources/js/main.js.map',
-    ], cb);
+    ], gulpCallback);
 });<% } %><% if (testESLint) { %>
 
-gulp.task('eslint', function () {
+gulp.task('eslint', () => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
         .pipe(eslint({
             configFile: '<%= testsPath %>/.eslintrc',
         }))
         .pipe(eslint.format())
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });<% } %><% if (testKarma) { %>
 
 // for easier debugging of the generated spec bundle
-gulp.task('specs:debug', function (gulpCallback) {
+gulp.task('specs:debug', gulpCallback => {
     let webpackConfig = Object.assign({}, require('./webpack-karma.config.js'), {
         context: __dirname,
         entry: '<%= testsPath %>/spec/main.js',
@@ -110,7 +108,7 @@ gulp.task('specs:debug', function (gulpCallback) {
         }
     });
 
-    webpack(webpackConfig, function (err, stats) {
+    webpack(webpackConfig, (err, stats) => {
         if (err) {
             throw new gutil.PluginError('webpack', err);
         }
@@ -127,18 +125,18 @@ gulp.task('specs:debug', function (gulpCallback) {
     });
 });
 
-gulp.task('specs', done => {
+gulp.task('specs', gulpCallback => {
     let KarmaServer = require('karma').Server;
 
     new KarmaServer.start({
         configFile: __dirname + '/karma.config.js',
         singleRun: true,
-    }, function() {
-        done();
+    }, () => {
+        gulpCallback();
     });
 });
 
-gulp.task('setup-tests', function (cb) {
+gulp.task('setup-tests', gulpCallback => {
     eventStream.concat(
         // jasmine
         gulp.src([
@@ -154,14 +152,14 @@ gulp.task('setup-tests', function (cb) {
         // es5-shim
         gulp.src('node_modules/es5-shim/es5-shim.js')
             .pipe(gulp.dest('<%= testsPath %>/libs'))
-    ).on('end', cb);
+    ).on('end', gulpCallback);
 });
 
 gulp.task('setup', [
     'setup-tests',
 ]);
 <% } %><% if (testSassLint) { %>
-gulp.task('test-css', function () {
+gulp.task('test-css', () => {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',<% if (addDocumentation) { %>
             '<%= sourcePath %>/doc/css/**/*.scss',<% } %>
@@ -173,7 +171,7 @@ gulp.task('test-css', function () {
         }))
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });<% } %>
@@ -188,14 +186,14 @@ gulp.task('test', [<% if (testSassLint) { %>
     'test-js',
 ]);<% if (addDocumentation) { %><% if (docMetalsmith) { %>
 
-gulp.task('templates', function () {
-    var metalsmith = require('gulp-metalsmith');
-    var metalsmithMarkdown = require('metalsmith-markdown');
-    var metalsmithPath = require('metalsmith-path');
-    var metalsmithLayouts = require('metalsmith-layouts');
-    var handlebars = require('handlebars');
+gulp.task('templates', () => {
+    const metalsmith = require('gulp-metalsmith');
+    const metalsmithMarkdown = require('metalsmith-markdown');
+    const metalsmithPath = require('metalsmith-path');
+    const metalsmithLayouts = require('metalsmith-layouts');
+    const handlebars = require('handlebars');
 
-    handlebars.registerHelper('if_eq', function (a, b, opts) {
+    handlebars.registerHelper('if_eq', (a, b, opts) => {
         if (a == b) {
             return opts.fn(this);
         } else {
@@ -233,9 +231,9 @@ gulp.task('templates', function () {
             stream: true,
         })));
 });<% } %><% if (docJekyll) { %>
-gulp.task('templates', function (gulpCallBack) {
-    var spawn = require('child_process').spawn;
-    var jekyll = spawn('bundler', [
+gulp.task('templates', gulpCallBack => {
+    const spawn = require('child_process').spawn;
+    const jekyll = spawn('bundler', [
         'exec',
         'jekyll',
         'build',
@@ -245,15 +243,15 @@ gulp.task('templates', function (gulpCallBack) {
         stdio: 'inherit',
     });
 
-    jekyll.on('exit', function (code) {
+    jekyll.on('exit', code => {
         browserSync.reload();
         gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
     });
 });<% } %><% } %>
 
-gulp.task('css', ['test-css'], function () {<% if (featureAutoprefixer) { %>
-    var postcss = require('gulp-postcss');
-    var autoprefixer = require('autoprefixer');
+gulp.task('css', ['test-css'], () => {<% if (featureAutoprefixer) { %>
+    const postcss = require('gulp-postcss');
+    const autoprefixer = require('autoprefixer');
 <% } %>
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
@@ -278,20 +276,20 @@ gulp.task('css', ['test-css'], function () {<% if (featureAutoprefixer) { %>
             aggressiveMerging: false,
         })))
         .pipe(gulp.dest('<%= distributionPath %>/css'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
-gulp.task('copy:scss', function () {
+gulp.task('copy:scss', () => {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(gulp.dest('<%= distributionPath %>/scss'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });<% if (addDocumentation && featureModernizr) { %>
 
-gulp.task('modernizr', function () {
+gulp.task('modernizr', () => {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',
             '<%= sourcePath %>/js/**/*.js',
@@ -308,7 +306,7 @@ gulp.task('modernizr', function () {
 
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
-], <% } %>function () {
+], <% } %>() => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
         .pipe(babel({
             modules: 'umd',
@@ -317,20 +315,20 @@ gulp.task('js', <% if (testESLint) { %>[
             pkg: pkg,
         })))
         .pipe(gulp.dest('<%= distributionPath %>/js'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
-gulp.task('fonts', function () {
+gulp.task('fonts', () => {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= distributionPath %>/fonts'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
-gulp.task('images', function () {
+gulp.task('images', () => {
     return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
         .pipe(imagemin({
             progressive: true,
@@ -342,14 +340,14 @@ gulp.task('images', function () {
             ],
         }))
         .pipe(gulp.dest('<%= distributionPath %>/img'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });<% if (addDocumentation) { %>
 
-gulp.task('css:doc', ['test-css'], function () {<% if (featureAutoprefixer) { %>
-    var postcss = require('gulp-postcss');
-    var autoprefixer = require('autoprefixer');
+gulp.task('css:doc', ['test-css'], () => {<% if (featureAutoprefixer) { %>
+    const postcss = require('gulp-postcss');
+    const autoprefixer = require('autoprefixer');
 <% } %>
     return gulp.src('<%= sourcePath %>/doc/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
@@ -377,15 +375,15 @@ gulp.task('css:doc', ['test-css'], function () {<% if (featureAutoprefixer) { %>
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css',
         })))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
 gulp.task('js:doc', <% if (testESLint) { %>[
     'eslint',
-], <% } %>function (<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) {<% if (moduleLoader == "webpack") { %>
-    var webpackConfig = {
+], <% } %>(<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) => {<% if (moduleLoader == "webpack") { %>
+    let webpackConfig = {
         context: __dirname,
         entry: '<%= sourcePath %>/doc/js/main.js',
         output: {
@@ -426,7 +424,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         );
     }
 
-    webpack(webpackConfig, function (err, stats) {
+    webpack(webpackConfig, (err, stats) => {
         if(err) throw new gutil.PluginError('webpack', err);
 
         gutil.log('[webpack]', stats.toString({
@@ -459,20 +457,20 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         .pipe(gulpif(isServeTask, browserSync.reload({
             match: '**/*.js',
         })))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });<% } %>
 });
 
-gulp.task('fonts:doc', function () {
+gulp.task('fonts:doc', () => {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= documentationPath %>/resources/fonts'))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
-gulp.task('images:doc', function () {
+gulp.task('images:doc', () => {
     return gulp.src('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}')
         .pipe(imagemin({
             progressive: true,
@@ -487,12 +485,12 @@ gulp.task('images:doc', function () {
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.{gif,jpg,png,svg}'
         })))
-        .on('error', function (error) {
+        .on('error', error => {
             console.error('' + error);
         });
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', () => {
     gulp.watch([
         '<%= sourcePath %>/css/**/*.scss',
         '<%= sourcePath %>/doc/css/**/*.scss',
@@ -505,7 +503,7 @@ gulp.task('watch', function () {
         '<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}',
         '<%= sourcePath %>/doc/img/**/*.{gif,jpg,png,svg}',
     ], ['images:doc']);
-    gulp.watch('<%= sourcePath %>/doc/templates/**/*.html', function () {
+    gulp.watch('<%= sourcePath %>/doc/templates/**/*.html', () => {
         runSequence(
             'templates',
             [
@@ -519,7 +517,7 @@ gulp.task('watch', function () {
     });
 });
 
-gulp.task('doc', ['clean:doc'], function (cb) {
+gulp.task('doc', ['clean:doc'], gulpCallback => {
     runSequence(
         'templates',
         [
@@ -529,14 +527,14 @@ gulp.task('doc', ['clean:doc'], function (cb) {
             'images:doc',
         ],<% if (featureModernizr) { %>
         'modernizr',<% } %>
-        cb
+        gulpCallback
     );
 });
 
 gulp.task('_serve', [
     'doc',
     'watch',
-], function () {
+], () => {
     browserSync({
         server: {
             baseDir: '<%= documentationPath %>'
@@ -544,7 +542,7 @@ gulp.task('_serve', [
     });
 });
 
-gulp.task('serve', function () {
+gulp.task('serve', () => {
     isServeTask = true;
 
     if (typeof argv.target === 'undefined') {
@@ -554,7 +552,7 @@ gulp.task('serve', function () {
     runSequence('_serve');
 });<% } %>
 
-gulp.task('default', ['clean'], function (cb) {
+gulp.task('default', ['clean'], gulpCallback => {
     runSequence(
         [
             'css',
@@ -563,6 +561,6 @@ gulp.task('default', ['clean'], function (cb) {
             'fonts',
             'images',
         ],
-        cb
+        gulpCallback
     );
 });
