@@ -4,9 +4,8 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 charset = utf-8
-indent_style = <% if (indentation == 'spaces') { %>space<% } else { %>tab<% } %>
-indent_size = <% if (indentation == 'spaces') { %><%=indentationSpaces %><% } else { %>4<% } %>
+indent_style = space
+indent_size = 4
 
-[*.json]<% if (indentation == 'tabs') { %>
-indent_style = space<% } %>
+[*.json]
 indent_size = 2

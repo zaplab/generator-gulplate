@@ -135,61 +135,6 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    prompSpacesOrTabs: function ()
-    {
-        var done = this.async();
-
-        this.prompt({
-            type: 'list',
-            name: 'indentation',
-            message: 'Indentation',
-            choices: [
-                {
-                    name: 'Spaces',
-                    value: 'spaces'
-                },
-                {
-                    name: 'Tabs',
-                    value: 'tabs'
-                }
-            ],
-            default: 'spaces'
-        }, function (answers) {
-            this.indentation = answers.indentation;
-            this.config.set('indentation', this.indentation);
-
-            done();
-        }.bind(this));
-    },
-
-    prompSpaces: function ()
-    {
-        if (this.indentation === 'spaces') {
-            var done = this.async();
-
-            this.prompt({
-                type: 'input',
-                name: 'indentationSpaces',
-                message: 'Number of spaces',
-                validate: function (input) {
-                    var numberValue = parseInt(input, 10);
-
-                    if (numberValue >= 0) {
-                        return true;
-                    } else {
-                        return 'You need to provide a number';
-                    }
-                }.bind(this),
-                default: 4
-            }, function (answers) {
-                this.indentationSpaces = answers.indentationSpaces;
-                this.config.set('indentationSpaces', this.indentationSpaces);
-
-                done();
-            }.bind(this));
-        }
-    },
-
     prompTransformJs: function ()
     {
         var done = this.async();
@@ -336,8 +281,8 @@ module.exports = yeoman.generators.Base.extend({
                     checked: true
                 },
                 {
-                    name: 'Mocha & Chai',
-                    value: 'mocha',
+                    name: 'Karma & Jasmine',
+                    value: 'karma',
                     checked: true
                 }
             ]
@@ -346,10 +291,10 @@ module.exports = yeoman.generators.Base.extend({
 
             this.testSassLint = hasFeature(features, 'sasslint');
             this.testESLint = hasFeature(features, 'eslint');
-            this.testMocha = hasFeature(features, 'mocha');
+            this.testKarma = hasFeature(features, 'karma');
             this.config.set('testSassLint', this.testSassLint);
             this.config.set('testESLint', this.testESLint);
-            this.config.set('testMocha', this.testMocha);
+            this.config.set('testKarma', this.testKarma);
 
             done();
         }.bind(this));
@@ -357,7 +302,7 @@ module.exports = yeoman.generators.Base.extend({
 
     promptTestsPath: function ()
     {
-        if (this.testSassLint || this.testESLint || this.testMocha) {
+        if (this.testSassLint || this.testESLint || this.testKarma) {
             var done = this.async();
 
             this.prompt({
@@ -387,14 +332,6 @@ module.exports = yeoman.generators.Base.extend({
                         {
                             name: 'None',
                             value: 'none'
-                        }, /*, // TODO
-                         {
-                         name: 'jspm',
-                         value: 'jspm'
-                         },*/
-                        {
-                            name: 'Require.js',
-                            value: 'requirejs'
                         },
                         {
                             name: 'Webpack',
@@ -453,6 +390,10 @@ module.exports = yeoman.generators.Base.extend({
     },
 
     writing: {
+        babel: function () {
+            this.copy('babelrc', '.babelrc');
+        },
+
         bower: function () {
             var bower = {
                 name: this._.slugify(this.projectName),
@@ -464,15 +405,6 @@ module.exports = yeoman.generators.Base.extend({
                 },
                 devDependencies: {}
             };
-
-            if (this.moduleLoader == 'requirejs') {
-                bower.dependencies.requirejs = '^2.1.15';
-            }
-
-            if (this.testMocha) {
-                bower.devDependencies.chai = '^1.10.0';
-                bower.devDependencies.mocha = '^2.1.0';
-            }
 
             if (this.addDocumentation) {
                 bower.devDependencies['google-code-prettify'] = '^1.0.4';
@@ -517,11 +449,6 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         modules: function () {
-            if (this.moduleLoader == 'requirejs') {
-                this.mkdir(this.sourcePath + '/js/config');
-                this.copy('src/js/config/requirejs.js', this.sourcePath + '/js/config/requirejs.js');
-            }
-
             this.copy('src/js/module-a.js', this.sourcePath + '/js/module-a.js');
         },
 
@@ -541,21 +468,28 @@ module.exports = yeoman.generators.Base.extend({
                     }
                 },
                 gulpModules = {
+                    'babel-core': '^6.3.13',
+                    'babel-plugin-add-module-exports': '^0.1.1',
+                    'babel-plugin-transform-es2015-modules-commonjs': '^6.1.20',
+                    'babel-plugin-transform-object-assign': '^6.3.13',
+                    'babel-preset-es2015': '^6.1.18',
+                    'babel-preset-stage-0': '^6.1.18',
                     del: '^1.2.0',
-                    'event-stream': '^3.3.1',
+                    'event-stream': '^3.3.2',
                     gulp: '^3.9.0',
-                    'gulp-util': '^3.0.6',
+                    'gulp-babel': '^6.1.1',
+                    'gulp-util': '^3.0.7',
                     'gulp-concat': '^2.6.0',
                     'gulp-cssmin': '^0.1.7',
-                    'gulp-header': '^1.2.2',
-                    'gulp-if': '^1.2.5',
-                    'gulp-imagemin': '^2.3.0',
-                    'gulp-sass': '^2.0.3',
-                    'gulp-sourcemaps': '^1.5.2',
-                    'gulp-uglify': '^1.2.0',
-                    'imagemin-pngquant': '^4.1.0',
-                    'run-sequence': '^1.1.1',
-                    yargs: '^3.14.0'
+                    'gulp-header': '^1.7.1',
+                    'gulp-if': '^2.0.0',
+                    'gulp-imagemin': '^2.4.0',
+                    'gulp-sass': '^2.1.0',
+                    'gulp-sourcemaps': '^1.6.0',
+                    'gulp-uglify': '^1.5.1',
+                    'imagemin-pngquant': '^4.2.0',
+                    'run-sequence': '^1.1.5',
+                    yargs: '^3.31.0'
                 },
                 key;
 
@@ -569,34 +503,25 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.main = this.distributionPath + '/js/main.js';
             }
 
-            if (this.transformJs) {
-                packageJSON.devDependencies['gulp-babel'] = '^5.2.1';
-            }
-
             if (this.testSassLint) {
-                packageJSON.devDependencies['gulp-sass-lint'] = '^1.0.1';
+                packageJSON.devDependencies['gulp-sass-lint'] = '^1.1.0';
             }
 
             if (this.testESLint) {
-                packageJSON.devDependencies['babel-eslint'] = '^4.0.10';
-                packageJSON.devDependencies['eslint-plugin-react'] = '^3.4.2';
-                packageJSON.devDependencies['eslint-config-airbnb'] = '^0.0.8';
+                packageJSON.devDependencies['babel-eslint'] = '^4.1.6';
+                packageJSON.devDependencies['eslint-plugin-react'] = '^3.11.3';
+                packageJSON.devDependencies['eslint-config-airbnb'] = '^2.0.0';
 
-                packageJSON.devDependencies['gulp-eslint'] = '^1.0.0';
+                packageJSON.devDependencies['gulp-eslint'] = '^1.1.1';
             }
 
-            if (this.moduleLoader == 'requirejs') {
-                packageJSON.devDependencies['gulp-requirejs-optimize'] = '^0.1.3';
-            }
-
-            if (this.moduleLoader == 'webpack') {
-                packageJSON.devDependencies['babel-core'] = '^5.8.25';
-                packageJSON.devDependencies['babel-loader'] = '^5.3.2';
-                packageJSON.devDependencies['webpack'] = '^1.12.2';
+            if ((this.moduleLoader == 'webpack') || this.testKarma) {
+                packageJSON.devDependencies['babel-loader'] = '^6.2.0';
+                packageJSON.devDependencies['webpack'] = '^1.12.9';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
-                packageJSON.devDependencies['browser-sync'] = '^2.9.3';
+                packageJSON.devDependencies['browser-sync'] = '^2.10.0';
             }
 
             if (this.htmlMetalsmith || this.docMetalsmith) {
@@ -604,19 +529,31 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
                 packageJSON.devDependencies['metalsmith-path'] = '^0.1.0';
                 packageJSON.devDependencies['metalsmith-layouts'] = '^1.4.2';
-                packageJSON.devDependencies['handlebars'] = '^4.0.4';
+                packageJSON.devDependencies['handlebars'] = '^4.0.5';
             }
 
-            if (this.testMocha) {
-                packageJSON.devDependencies['gulp-connect'] = '^2.2.0';
-                packageJSON.devDependencies['gulp-mocha-phantomjs'] = '^0.9.0';
+            if (this.testKarma) {
+                packageJSON.devDependencies['phantomjs'] = '^1.9.19';
+                packageJSON.devDependencies['karma'] = '^0.13.15';
+                packageJSON.devDependencies['karma-jasmine'] = '^0.3.6';
+                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.1';
+                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.23';
+                packageJSON.devDependencies['karma-webpack'] = '^1.7.0';
+
+                packageJSON.devDependencies['jasmine'] = '^2.4.1 ';
+                packageJSON.devDependencies['jasmine-ajax'] = '^3.2.0';
+                packageJSON.devDependencies['jasmine-expect'] = '^2.0.0-beta2';
+
+                packageJSON.devDependencies['es5-shim'] = '^4.3.1';
+
                 packageJSON.scripts = {
-                    postinstall: './node_modules/.bin/gulp setup'
+                    postinstall: './node_modules/.bin/gulp setup',
+                    test: './node_modules/karma/bin/karma start karma.config.js',
                 };
             }
 
             if (this.featureAutoprefixer) {
-                packageJSON.devDependencies['autoprefixer'] = '^6.1.0';
+                packageJSON.devDependencies['autoprefixer'] = '^6.1.2';
                 packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
@@ -657,7 +594,7 @@ module.exports = yeoman.generators.Base.extend({
             }
         },
 
-        jekyll: function () {
+        templates: function () {
             var extraPath = '';
 
             if (this.htmlMetalsmith || this.htmlJekyll || this.addDocumentation) {
@@ -681,25 +618,13 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         test: function () {
-            if (this.testMocha) {
-                this.mkdir(this.testsPath + '/unit');
-                this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-
-                if (this.moduleLoader == 'requirejs') {
-                    this.mkdir(this.testsPath + '/unit/requirejs');
-                    this.copy('tests/unit/requirejs/_main.js', this.testsPath + '/unit/requirejs/_main.js');
-                    this.copy('tests/unit/requirejs/basic.js', this.testsPath + '/unit/requirejs/basic.js');
-                    this.copy('tests/unit/basic.js', this.testsPath + '/unit/basic.js');
-
-                    if (this.projectType === 'website') {
-                        this.copy('tests/index-requirejs.html', this.testsPath + '/index.html');
-                    } else {
-                        this.copy('tests/index.html', this.testsPath + '/index.html');
-                        this.copy('tests/index-requirejs.html', this.testsPath + '/index-requirejs.html');
-                    }
-                } else {
-                    this.copy('tests/index.html', this.testsPath + '/index.html');
-                }
+            if (this.testKarma) {
+                this.mkdir(this.testsPath + '/spec');
+                this.copy('tests/spec/_basic.js', this.testsPath + '/spec/_basic.js');
+                this.copy('tests/spec/main.js', this.testsPath + '/spec/main.js');
+                this.copy('tests/specs.html', this.testsPath + '/specs.html');
+                this.copy('karma.config.js');
+                this.copy('webpack-karma.config.js');
             }
         }
     },

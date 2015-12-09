@@ -1,5 +1,4 @@
 
-import * as moduleA from 'module-a';
+import moduleA from './module-a';
 
-console.log('gulplate');
-moduleA.log();
+console.log('gulplate', moduleA.hello());

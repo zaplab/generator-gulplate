@@ -142,11 +142,41 @@ the following folders / files will be added
 │       │   └── subpage.html
 │       └── js
 │           └── main.js
-└── Gemfile
+└── [Gemfile]
 ```
 
 and the following gulp task
 
 ```
 $ gulp doc
+```
+
+### If Karma and Jasmine are added:
+
+```
+├── tests
+│   ├── libs
+│   │   └── ...
+│   ├── spec
+│   │   └── ...
+│   └── specs.html
+├── karma.config.js
+└── webpack-karma.config.js
+```
+
+and the following gulp task
+
+```
+$ gulp specs
+```
+
+will create spec bundle for specs.html:
+```
+$ gulp specs:debug
+```
+
+will start karma in watch mode:
+
+```
+$ npm test
 ```
