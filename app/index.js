@@ -469,7 +469,7 @@ module.exports = yeoman.generators.Base.extend({
                     }
                 },
                 gulpModules = {
-                    del: '^2.2.0',
+                    del: '^1.2.0',
                     'event-stream': '^3.3.2',
                     gulp: '^3.9.0',
                     'gulp-util': '^3.0.7',
