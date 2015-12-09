@@ -295,6 +295,7 @@ gulp.task('modernizr', function () {
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>function (<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) {<% if (moduleLoader == "webpack") { %>
+    var webpackConfig = {
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
@@ -330,12 +331,12 @@ gulp.task('js', <% if (testESLint) { %>[
     };
 
     if (!isDevMode) {
-        myConfig.plugins = myConfig.plugins.concat(
+        webpackConfig.plugins = webpackConfig.plugins.concat(
             new webpack.optimize.UglifyJsPlugin()
         );
     }
 
-    webpack(myConfig, function (err, stats) {
+    webpack(webpackConfig, function (err, stats) {
         if (err) {
             throw new gutil.PluginError('webpack', err);
         }
@@ -348,7 +349,7 @@ gulp.task('js', <% if (testESLint) { %>[
             match: '**/*.js',
         });
 
-        callback();
+        gulpCallback();
     });<% } %><% if (moduleLoader == "none") { %>
     return gulp.src([
             '<%= sourcePath %>/js/module-a.js',

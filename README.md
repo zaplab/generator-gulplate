@@ -142,7 +142,7 @@ the following folders / files will be added
 │       │   └── subpage.html
 │       └── js
 │           └── main.js
-└── Gemfile
+└── [Gemfile]
 ```
 
 and the following gulp task
