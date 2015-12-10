@@ -1,4 +1,6 @@
 
+'use strict';
+
 const argv = require('yargs').argv;
 const del = require('del');
 const gulp = require('gulp');<% if (transformJs) { %>
