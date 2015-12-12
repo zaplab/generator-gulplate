@@ -78,7 +78,9 @@ gulp.task('clean', gulpCallback => {
         '<%= distributionPath %>/resources/fonts',
         '<%= distributionPath %>/resources/img',
         '<%= distributionPath %>/resources/js/main.js.map',
-    ], gulpCallback);
+    ].then(paths => {
+        gulpCallback();
+    });
 });<% if (testESLint) { %>
 
 gulp.task('eslint', () => {

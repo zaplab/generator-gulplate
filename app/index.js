@@ -474,7 +474,7 @@ module.exports = yeoman.generators.Base.extend({
                     'babel-plugin-transform-object-assign': '^6.3.13',
                     'babel-preset-es2015': '^6.1.18',
                     'babel-preset-stage-0': '^6.1.18',
-                    del: '^1.2.0',
+                    del: '^2.2.0',
                     'event-stream': '^3.3.2',
                     gulp: '^3.9.0',
                     'gulp-babel': '^6.1.1',
