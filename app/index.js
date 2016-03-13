@@ -547,7 +547,7 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['es5-shim'] = '^4.3.1';
 
                 packageJSON.scripts = {
-                    test: './node_modules/karma/bin/karma start karma.config.js',
+                    test: 'karma start',
                 };
             }
 
