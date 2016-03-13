@@ -436,9 +436,9 @@ module.exports = yeoman.generators.Base.extend({
 
         gulpfile: function () {
             if (this.projectType === 'website') {
-                this.copy('gulpfile-website.js', 'gulpfile.js');
+                this.copy('gulpfile-website.js', 'gulpfile.babel.js');
             } else {
-                this.copy('gulpfile-module.js', 'gulpfile.js');
+                this.copy('gulpfile-module.js', 'gulpfile.babel.js');
             }
         },
 

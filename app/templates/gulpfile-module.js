@@ -1,32 +1,32 @@
 
 'use strict';
 
-const argv = require('yargs').argv;
-const del = require('del');
-const gulp = require('gulp');<% if (transformJs) { %>
-const babel = require('gulp-babel');<% } %>
-const gulpif = require('gulp-if');
-const concat = require('gulp-concat');<% if (testSassLint) { %>
-const sassLint = require('gulp-sass-lint');<% } %>
-const cssmin = require('gulp-cssmin');
-const imagemin = require('gulp-imagemin');
-const pngquant = require('imagemin-pngquant');<% if (testESLint) { %>
-const eslint = require('gulp-eslint');<% } %>
-const uglify = require('gulp-uglify');
-const sass = require('gulp-sass');
-const sourcemaps = require('gulp-sourcemaps');
-const browserSync = require('browser-sync');
-const runSequence = require('run-sequence');
-const header = require('gulp-header');
-const eventStream = require('event-stream');<% if ((moduleLoader == "webpack") || testKarma) { %>
-const gutil = require('gulp-util');
-const webpack = require('webpack');<% } %><% if (featureModernizr) { %>
-const modernizr = require('gulp-modernizr');<% } %>
-const path = require('path');
+import { argv } from 'yargs';
+import del from 'del';
+import gulp from 'gulp';<% if (transformJs) { %>
+import babel from 'gulp-babel';<% } %>
+import gulpif from 'gulp-if';
+import concat from 'gulp-concat';<% if (testSassLint) { %>
+import sassLint from 'gulp-sass-lint';<% } %>
+import cssmin from 'gulp-cssmin';
+import imagemin from 'gulp-imagemin';
+import pngquant from 'imagemin-pngquant';<% if (testESLint) { %>
+import eslint from 'gulp-eslint';<% } %>
+import uglify from 'gulp-uglify';
+import sass from 'gulp-sass';
+import sourcemaps from 'gulp-sourcemaps';
+import browserSync from 'browser-sync';
+import runSequence from 'run-sequence';
+import header from 'gulp-header';
+import eventStream from 'event-stream';<% if ((moduleLoader == "webpack") || testKarma) { %>
+import gutil from 'gulp-util';
+import webpack from 'webpack';<% } %><% if (featureModernizr) { %>
+import modernizr from 'gulp-modernizr';<% } %>
+import path from 'path';
 
 let isDevMode = false;
 let isServeTask = false;
-let pkg = require('./package.json');
+import pkg from './package.json';
 const banner = [
         '/*!',
         ' <%%= pkg.name %> <%%= pkg.version %>',
