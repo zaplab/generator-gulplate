@@ -78,7 +78,7 @@ gulp.task('clean', gulpCallback => {
         '<%= distributionPath %>/fonts',
         '<%= distributionPath %>/img',
         '<%= distributionPath %>/js',
-    ].then(paths => {
+    ]).then(paths => {
         gulpCallback();
     });
 });<% if (addDocumentation) { %>
