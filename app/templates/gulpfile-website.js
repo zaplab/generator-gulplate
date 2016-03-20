@@ -96,13 +96,13 @@ gulp.task('eslint', () => {
 
 // for easier debugging of the generated spec bundle
 gulp.task('specs:debug', gulpCallback => {
-    let webpackConfig = Object.assign({}, require('./webpack.config.js'), {
+    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
         context: __dirname,
         entry: '<%= testsPath %>/spec/main.js',
         output: {
             path: '<%= testsPath %>/spec-debug/',
             filename: 'bundle.js',
-        }
+        },
     });
 
     webpack(webpackConfig, (err, stats) => {
@@ -122,15 +122,15 @@ gulp.task('specs:debug', gulpCallback => {
     });
 });
 
-gulp.task('specs', done => {
-    let KarmaServer = require('karma').Server;
+gulp.task('specs', gulpCallback => {
+    const KarmaServer = require('karma').Server;
 
-    new KarmaServer.start({
+    new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true,
     }, () => {
-        done();
-    });
+        gulpCallback();
+    }).start();
 });
 
 gulp.task('setup-tests', gulpCallback => {
@@ -244,7 +244,9 @@ gulp.task('templates', gulpCallback => {
     });
 });<% } %>
 
-gulp.task('css', ['test-css'], () => {<% if (featureAutoprefixer) { %>
+gulp.task('css', [
+    'test-css',
+], () => {<% if (featureAutoprefixer) { %>
     const postcss = require('gulp-postcss');
     const autoprefixer = require('autoprefixer');
 <% } %>
@@ -297,7 +299,7 @@ gulp.task('modernizr', () => {
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>(<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) => {<% if (moduleLoader == "webpack") { %>
-    let webpackConfig = {
+    const webpackConfig = {
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
@@ -430,8 +432,8 @@ gulp.task('_serve', [
 ], () => {
     browserSync({
         server: {
-            baseDir: '<%= distributionPath %>'
-        }
+            baseDir: '<%= distributionPath %>',
+        },
     });
 });
 
@@ -445,7 +447,9 @@ gulp.task('serve', () => {
     runSequence('_serve');
 });
 
-gulp.task('default', ['clean'], gulpCallback => {
+gulp.task('default', [
+    'clean',
+], gulpCallback => {
     runSequence(<% if (htmlMetalsmith || htmlJekyll) { %>
         'templates',<% } %>
         [

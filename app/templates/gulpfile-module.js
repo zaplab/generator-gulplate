@@ -103,13 +103,13 @@ gulp.task('eslint', () => {
 
 // for easier debugging of the generated spec bundle
 gulp.task('specs:debug', gulpCallback => {
-    let webpackConfig = Object.assign({}, require('./webpack.config.js'), {
+    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
         context: __dirname,
         entry: '<%= testsPath %>/spec/main.js',
         output: {
             path: '<%= testsPath %>/spec-debug/',
             filename: 'bundle.js',
-        }
+        },
     });
 
     webpack(webpackConfig, (err, stats) => {
@@ -130,14 +130,14 @@ gulp.task('specs:debug', gulpCallback => {
 });
 
 gulp.task('specs', gulpCallback => {
-    let KarmaServer = require('karma').Server;
+    const KarmaServer = require('karma').Server;
 
-    new KarmaServer.start({
+    new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true,
     }, () => {
         gulpCallback();
-    });
+    }).start();
 });
 
 gulp.task('setup-tests', gulpCallback => {
@@ -253,7 +253,9 @@ gulp.task('templates', gulpCallBack => {
     });
 });<% } %><% } %>
 
-gulp.task('css', ['test-css'], () => {<% if (featureAutoprefixer) { %>
+gulp.task('css', [
+    'test-css',
+], () => {<% if (featureAutoprefixer) { %>
     const postcss = require('gulp-postcss');
     const autoprefixer = require('autoprefixer');
 <% } %>
@@ -349,7 +351,9 @@ gulp.task('images', () => {
         });
 });<% if (addDocumentation) { %>
 
-gulp.task('css:doc', ['test-css'], () => {<% if (featureAutoprefixer) { %>
+gulp.task('css:doc', [
+    'test-css',
+], () => {<% if (featureAutoprefixer) { %>
     const postcss = require('gulp-postcss');
     const autoprefixer = require('autoprefixer');
 <% } %>
@@ -387,7 +391,7 @@ gulp.task('css:doc', ['test-css'], () => {<% if (featureAutoprefixer) { %>
 gulp.task('js:doc', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>(<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) => {<% if (moduleLoader == "webpack") { %>
-    let webpackConfig = {
+    const webpackConfig = {
         context: __dirname,
         entry: '<%= sourcePath %>/doc/js/main.js',
         output: {
@@ -521,7 +525,9 @@ gulp.task('watch', () => {
     });
 });
 
-gulp.task('doc', ['clean:doc'], gulpCallback => {
+gulp.task('doc', [
+    'clean:doc',
+], gulpCallback => {
     runSequence(
         'templates',
         [
@@ -541,8 +547,8 @@ gulp.task('_serve', [
 ], () => {
     browserSync({
         server: {
-            baseDir: '<%= documentationPath %>'
-        }
+            baseDir: '<%= documentationPath %>',
+        },
     });
 });
 
@@ -556,7 +562,9 @@ gulp.task('serve', () => {
     runSequence('_serve');
 });<% } %>
 
-gulp.task('default', ['clean'], gulpCallback => {
+gulp.task('default', [
+    'clean',
+], gulpCallback => {
     runSequence(
         [
             'css',
