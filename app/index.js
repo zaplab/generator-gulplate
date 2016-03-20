@@ -398,11 +398,7 @@ module.exports = yeoman.generators.Base.extend({
             var bower = {
                 name: this._.slugify(this.projectName),
                 'private': true,
-                dependencies: {
-                    'compass-breakpoint': '^2.6.1',
-                    'compass-mixins': '^0.12.7',
-                    susy: '^2.2.6'
-                },
+                dependencies: {},
                 devDependencies: {}
             };
 
@@ -474,6 +470,8 @@ module.exports = yeoman.generators.Base.extend({
                     'babel-plugin-transform-object-assign': '^6.5.0',
                     'babel-preset-es2015': '^6.6.0',
                     'babel-preset-stage-0': '^6.5.0',
+                    'breakpoint-sass': '^2.7.0',
+                    'compass-mixins': '^0.12.7',
                     del: '^2.2.0',
                     'event-stream': '^3.3.2',
                     gulp: '^3.9.1',
@@ -489,6 +487,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-uglify': '^1.5.3',
                     'imagemin-pngquant': '^4.2.2',
                     'run-sequence': '^1.1.5',
+                    susy: '^2.2.12',
                     yargs: '^4.3.2'
                 },
                 key;
