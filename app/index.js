@@ -621,8 +621,8 @@ module.exports = yeoman.generators.Base.extend({
                 this.copy('tests/spec/_basic.js', this.testsPath + '/spec/_basic.js');
                 this.copy('tests/spec/main.js', this.testsPath + '/spec/main.js');
                 this.copy('tests/specs.html', this.testsPath + '/specs.html');
-                this.copy('karma.config.js');
-                this.copy('webpack-karma.config.js');
+                this.copy('karma.conf.js');
+                this.copy('webpack.config.js');
             }
         }
     },

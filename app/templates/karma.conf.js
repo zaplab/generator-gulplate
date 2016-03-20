@@ -41,7 +41,7 @@ module.exports = function (config) {
             'spec',
         ],
 
-        webpack: require('./webpack-karma.config.js'),
+        webpack: require('./webpack.config.js'),
 
         webpackMiddleware: {
             stats: {
