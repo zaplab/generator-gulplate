@@ -535,7 +535,7 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['phantomjs'] = '^1.9.19';
                 packageJSON.devDependencies['karma'] = '^0.13.22';
                 packageJSON.devDependencies['karma-jasmine'] = '^0.3.8';
-                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^1.0.0';
+                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.3';
                 packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.24';
                 packageJSON.devDependencies['karma-webpack'] = '^1.7.0';
 
