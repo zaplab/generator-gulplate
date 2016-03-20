@@ -46,6 +46,15 @@ switch (argv.target) {
         isDevMode = false;
 }
 
+function onWarning(error) {
+    gutil.log(error);
+}
+
+function onError(error) {
+    gutil.log(error);
+    process.exit(1);
+}
+
 // Workaround for https://github.com/gulpjs/gulp/issues/71
 var origSrc = gulp.src;
 gulp.src = function () {
@@ -89,9 +98,7 @@ gulp.task('eslint', () => {
             configFile: '<%= testsPath %>/.eslintrc',
         }))
         .pipe(eslint.format())
-        .on('error', error => {
-            console.error('' + error);
-        });
+        .on('error', onWarning);
 });<% } %><% if (testKarma) { %>
 
 // for easier debugging of the generated spec bundle
@@ -128,7 +135,11 @@ gulp.task('specs', gulpCallback => {
     new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true,
-    }, () => {
+    }, karmaExitCode => {
+        if (karmaExitCode !== 0) {
+            process.exit(1);
+        }
+
         gulpCallback();
     }).start();
 });
@@ -165,9 +176,7 @@ gulp.task('test-css', () => {
         }))
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
-        .on('error', error => {
-            console.error('' + error);
-        });
+        .on('error', onWarning);
 });<% } %>
 
 gulp.task('test-js', [<% if (testESLint) { %>
@@ -276,9 +285,7 @@ gulp.task('css', [
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.css',
         })))
-        .on('error', error => {
-            console.error('' + error);
-        });
+        .on('error', onError);
 });<% if (featureModernizr) { %>
 
 gulp.task('modernizr', () => {
@@ -375,17 +382,13 @@ gulp.task('js', <% if (testESLint) { %>[
         .pipe(gulpif(isServeTask, browserSync.reload({
             match: '**/*.js',
         })))
-        .on('error', error => {
-            console.error('' + error);
-        });<% } %>
+        .on('error', onError);<% } %>
 });
 
 gulp.task('fonts', () => {
     return gulp.src('<%= sourcePath %>/fonts/**/*.{ttf,woff,eof,svg}')
         .pipe(gulp.dest('<%= distributionPath %>/resources/fonts'))
-        .on('error', error => {
-            console.error('' + error);
-        });
+        .on('error', onError);
 });
 
 gulp.task('images', () => {
@@ -403,9 +406,7 @@ gulp.task('images', () => {
         .pipe(gulpif(isServeTask, browserSync.stream({
             match: '**/*.{gif,jpg,png,svg}'
         })))
-        .on('error', error => {
-            console.error('' + error);
-        });
+        .on('error', onError);
 });
 
 gulp.task('watch', () => {
