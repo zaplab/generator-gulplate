@@ -37,7 +37,7 @@ module.exports = yeoman.generators.Base.extend({
 
         this.option('skip-install', {
             type: Boolean,
-            desc: 'Skip the bower, node and maybe gem installations',
+            desc: 'Skip the npm and maybe gem installations',
             defaults: false
         });
 
@@ -394,18 +394,6 @@ module.exports = yeoman.generators.Base.extend({
             this.copy('babelrc', '.babelrc');
         },
 
-        bower: function () {
-            var bower = {
-                name: this._.slugify(this.projectName),
-                'private': true,
-                dependencies: {},
-                devDependencies: {}
-            };
-
-            this.copy('bowerrc', '.bowerrc');
-            this.write('bower.json', JSON.stringify(bower, null, 2));
-        },
-
         sasslint: function () {
             if (this.testSassLint) {
                 this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
@@ -640,6 +628,7 @@ module.exports = yeoman.generators.Base.extend({
             this.log('Then:\n> ' + chalk.yellow.bold('gulp serve'));
         } else {
             this.installDependencies({
+                bower: false,
                 callback: function () {
                     if (this.htmlJekyll || this.docJekyll) {
                         this.spawnCommand('bundler', ['install']);
