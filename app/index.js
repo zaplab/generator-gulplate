@@ -402,10 +402,6 @@ module.exports = yeoman.generators.Base.extend({
                 devDependencies: {}
             };
 
-            if (this.addDocumentation) {
-                bower.devDependencies['google-code-prettify'] = '^1.0.4';
-            }
-
             this.copy('bowerrc', '.bowerrc');
             this.write('bower.json', JSON.stringify(bower, null, 2));
         },
@@ -486,6 +482,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
                     'imagemin-pngquant': '^4.2.2',
+                    prismjs: '^1.4.1',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
                     yargs: '^4.3.2'
