@@ -96,7 +96,9 @@ gulp.task('clean:doc', gulpCallback => {
     del([
         '<%= documentationPath %>/resources/css/main.css.map',
         '<%= documentationPath %>/resources/js/main.js.map',
-    ], gulpCallback);
+    ]).then(() => {
+        gulpCallback();
+    });
 });<% } %><% if (testESLint) { %>
 
 gulp.task('eslint', () => {
