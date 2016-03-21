@@ -470,7 +470,6 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
                     'imagemin-pngquant': '^4.2.2',
-                    prismjs: '^1.4.1',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
                     yargs: '^4.3.2'
@@ -505,6 +504,10 @@ module.exports = yeoman.generators.Base.extend({
 
             if ((this.projectType === 'website') || this.addDocumentation) {
                 packageJSON.devDependencies['browser-sync'] = '^2.11.1';
+            }
+
+            if (this.addDocumentation) {
+                packageJSON.devDependencies['prismjs'] = '^1.4.1';
             }
 
             if (this.htmlMetalsmith || this.docMetalsmith) {
