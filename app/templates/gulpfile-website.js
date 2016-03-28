@@ -1,6 +1,4 @@
 
-'use strict';
-
 import { argv } from 'yargs';
 import del from 'del';
 import gulp from 'gulp';<% if (transformJs) { %>
@@ -56,15 +54,18 @@ function onError(error) {
 }
 
 // Workaround for https://github.com/gulpjs/gulp/issues/71
-var origSrc = gulp.src;
+let origSrc = gulp.src;
+
 gulp.src = function () {
     return fixPipe(origSrc.apply(this, arguments));
 };
+
 function fixPipe(stream) {
-    var origPipe = stream.pipe;
+    let origPipe = stream.pipe;
     stream.pipe = function (dest) {
         arguments[0] = dest.on('error', function (error) {
-            var nextStreams = dest._nextStreams;
+            let nextStreams = dest._nextStreams;
+
             if (nextStreams) {
                 nextStreams.forEach(function (nextStream) {
                     nextStream.emit('error', error);
@@ -73,8 +74,10 @@ function fixPipe(stream) {
                 throw error;
             }
         });
-        var nextStream = fixPipe(origPipe.apply(this, arguments));
+
+        let nextStream = fixPipe(origPipe.apply(this, arguments));
         (this._nextStreams || (this._nextStreams = [])).push(nextStream);
+
         return nextStream;
     };
     return stream;
