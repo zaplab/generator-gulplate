@@ -13,7 +13,7 @@ module.exports = function (config) {
             '<%= testsPath %>/libs/es5-shim.js',
             '<%= testsPath %>/libs/jasmine.js',
             '<%= testsPath %>/libs/jasmine-matchers.js',
-            '<%= testsPath %>/spec/_*.js',
+            '<%= testsPath %>/spec/**/*.js',
             {
                 pattern: '<%= sourcePath %>/js/**/*.js',
                 watched: true,
@@ -34,14 +34,14 @@ module.exports = function (config) {
         ],
 
         preprocessors: {
-            '<%= testsPath %>/spec/_*.js': ['webpack'],
+            '<%= testsPath %>/spec/**/*.js': ['webpack'],
         },
 
         reporters: [
             'spec',
         ],
 
-        webpack: require('./webpack-karma.config.js'),
+        webpack: require('./webpack.config.js'),
 
         webpackMiddleware: {
             stats: {

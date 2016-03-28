@@ -37,7 +37,7 @@ module.exports = yeoman.generators.Base.extend({
 
         this.option('skip-install', {
             type: Boolean,
-            desc: 'Skip the bower, node and maybe gem installations',
+            desc: 'Skip the npm and maybe gem installations',
             defaults: false
         });
 
@@ -394,26 +394,6 @@ module.exports = yeoman.generators.Base.extend({
             this.copy('babelrc', '.babelrc');
         },
 
-        bower: function () {
-            var bower = {
-                name: this._.slugify(this.projectName),
-                'private': true,
-                dependencies: {
-                    'compass-breakpoint': '^2.6.1',
-                    'compass-mixins': '^0.12.7',
-                    susy: '^2.2.6'
-                },
-                devDependencies: {}
-            };
-
-            if (this.addDocumentation) {
-                bower.devDependencies['google-code-prettify'] = '^1.0.4';
-            }
-
-            this.copy('bowerrc', '.bowerrc');
-            this.write('bower.json', JSON.stringify(bower, null, 2));
-        },
-
         sasslint: function () {
             if (this.testSassLint) {
                 this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
@@ -436,9 +416,9 @@ module.exports = yeoman.generators.Base.extend({
 
         gulpfile: function () {
             if (this.projectType === 'website') {
-                this.copy('gulpfile-website.js', 'gulpfile.js');
+                this.copy('gulpfile-website.js', 'gulpfile.babel.js');
             } else {
-                this.copy('gulpfile-module.js', 'gulpfile.js');
+                this.copy('gulpfile-module.js', 'gulpfile.babel.js');
             }
         },
 
@@ -464,32 +444,35 @@ module.exports = yeoman.generators.Base.extend({
                     },
                     dependencies: {},
                     devDependencies: {
-                        bower: '^1.4.1'
+                        bower: '^1.7.7'
                     }
                 },
                 gulpModules = {
-                    'babel-core': '^6.3.13',
-                    'babel-plugin-add-module-exports': '^0.1.1',
-                    'babel-plugin-transform-es2015-modules-commonjs': '^6.1.20',
-                    'babel-plugin-transform-object-assign': '^6.3.13',
-                    'babel-preset-es2015': '^6.1.18',
-                    'babel-preset-stage-0': '^6.1.18',
-                    del: '^1.2.0',
+                    'babel-core': '^6.7.0',
+                    'babel-plugin-add-module-exports': '^0.1.2',
+                    'babel-plugin-transform-es2015-modules-commonjs': '^6.7.0',
+                    'babel-plugin-transform-object-assign': '^6.5.0',
+                    'babel-preset-es2015': '^6.6.0',
+                    'babel-preset-stage-0': '^6.5.0',
+                    'breakpoint-sass': '^2.7.0',
+                    'compass-mixins': '^0.12.7',
+                    del: '^2.2.0',
                     'event-stream': '^3.3.2',
-                    gulp: '^3.9.0',
-                    'gulp-babel': '^6.1.1',
+                    gulp: '^3.9.1',
+                    'gulp-babel': '^6.1.2',
                     'gulp-util': '^3.0.7',
                     'gulp-concat': '^2.6.0',
                     'gulp-cssmin': '^0.1.7',
                     'gulp-header': '^1.7.1',
                     'gulp-if': '^2.0.0',
                     'gulp-imagemin': '^2.4.0',
-                    'gulp-sass': '^2.1.0',
+                    'gulp-sass': '^2.2.0',
                     'gulp-sourcemaps': '^1.6.0',
-                    'gulp-uglify': '^1.5.1',
-                    'imagemin-pngquant': '^4.2.0',
+                    'gulp-uglify': '^1.5.3',
+                    'imagemin-pngquant': '^4.2.2',
                     'run-sequence': '^1.1.5',
-                    yargs: '^3.31.0'
+                    susy: '^2.2.12',
+                    yargs: '^4.3.2'
                 },
                 key;
 
@@ -504,56 +487,58 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testSassLint) {
-                packageJSON.devDependencies['gulp-sass-lint'] = '^1.1.0';
+                packageJSON.devDependencies['gulp-sass-lint'] = '^1.1.1';
             }
 
             if (this.testESLint) {
-                packageJSON.devDependencies['babel-eslint'] = '^4.1.6';
-                packageJSON.devDependencies['eslint-plugin-react'] = '^3.11.3';
-                packageJSON.devDependencies['eslint-config-airbnb'] = '^2.0.0';
-
-                packageJSON.devDependencies['gulp-eslint'] = '^1.1.1';
+                packageJSON.devDependencies['babel-eslint'] = '^5.0.0';
+                packageJSON.devDependencies['eslint-plugin-react'] = '^4.2.3';
+                packageJSON.devDependencies['eslint-config-airbnb'] = '^6.1.0';
+                packageJSON.devDependencies['gulp-eslint'] = '^2.0.0';
             }
 
             if ((this.moduleLoader == 'webpack') || this.testKarma) {
-                packageJSON.devDependencies['babel-loader'] = '^6.2.0';
-                packageJSON.devDependencies['webpack'] = '^1.12.9';
+                packageJSON.devDependencies['babel-loader'] = '^6.2.4';
+                packageJSON.devDependencies['webpack'] = '^1.12.14';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
-                packageJSON.devDependencies['browser-sync'] = '^2.10.0';
+                packageJSON.devDependencies['browser-sync'] = '^2.11.1';
+            }
+
+            if (this.addDocumentation) {
+                packageJSON.devDependencies['prismjs'] = '^1.4.1';
             }
 
             if (this.htmlMetalsmith || this.docMetalsmith) {
-                packageJSON.devDependencies['gulp-metalsmith'] = '0.0.3';
+                packageJSON.devDependencies['gulp-metalsmith'] = '^1.0.0';
                 packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
-                packageJSON.devDependencies['metalsmith-path'] = '^0.1.0';
-                packageJSON.devDependencies['metalsmith-layouts'] = '^1.4.2';
+                packageJSON.devDependencies['metalsmith-path'] = '^0.2.0';
+                packageJSON.devDependencies['metalsmith-layouts'] = '^1.6.4';
                 packageJSON.devDependencies['handlebars'] = '^4.0.5';
             }
 
             if (this.testKarma) {
                 packageJSON.devDependencies['phantomjs'] = '^1.9.19';
-                packageJSON.devDependencies['karma'] = '^0.13.15';
-                packageJSON.devDependencies['karma-jasmine'] = '^0.3.6';
-                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.1';
-                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.23';
+                packageJSON.devDependencies['karma'] = '^0.13.22';
+                packageJSON.devDependencies['karma-jasmine'] = '^0.3.8';
+                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.3';
+                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.24';
                 packageJSON.devDependencies['karma-webpack'] = '^1.7.0';
 
                 packageJSON.devDependencies['jasmine'] = '^2.4.1 ';
                 packageJSON.devDependencies['jasmine-ajax'] = '^3.2.0';
-                packageJSON.devDependencies['jasmine-expect'] = '^2.0.0-beta2';
+                packageJSON.devDependencies['jasmine-expect'] = '^2.0.2';
 
-                packageJSON.devDependencies['es5-shim'] = '^4.3.1';
+                packageJSON.devDependencies['es5-shim'] = '^4.5.7';
 
                 packageJSON.scripts = {
-                    postinstall: './node_modules/.bin/gulp setup',
-                    test: './node_modules/karma/bin/karma start karma.config.js',
+                    test: 'karma start',
                 };
             }
 
             if (this.featureAutoprefixer) {
-                packageJSON.devDependencies['autoprefixer'] = '^6.1.2';
+                packageJSON.devDependencies['autoprefixer'] = '^6.3.3';
                 packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
@@ -623,8 +608,8 @@ module.exports = yeoman.generators.Base.extend({
                 this.copy('tests/spec/_basic.js', this.testsPath + '/spec/_basic.js');
                 this.copy('tests/spec/main.js', this.testsPath + '/spec/main.js');
                 this.copy('tests/specs.html', this.testsPath + '/specs.html');
-                this.copy('karma.config.js');
-                this.copy('webpack-karma.config.js');
+                this.copy('karma.conf.js');
+                this.copy('webpack.config.js');
             }
         }
     },
@@ -646,6 +631,7 @@ module.exports = yeoman.generators.Base.extend({
             this.log('Then:\n> ' + chalk.yellow.bold('gulp serve'));
         } else {
             this.installDependencies({
+                bower: false,
                 callback: function () {
                     if (this.htmlJekyll || this.docJekyll) {
                         this.spawnCommand('bundler', ['install']);
