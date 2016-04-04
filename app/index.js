@@ -444,13 +444,22 @@ module.exports = yeoman.generators.Base.extend({
                     },
                     dependencies: {},
                     devDependencies: {
-                        bower: '^1.7.7'
+                        bower: '^1.7.8'
                     }
                 },
                 gulpModules = {
                     'babel-core': '^6.7.0',
-                    'babel-plugin-add-module-exports': '^0.1.2',
-                    'babel-plugin-transform-es2015-modules-commonjs': '^6.7.0',
+                    "babel-plugin-add-module-exports": "^0.1.2",
+                    "babel-plugin-transform-async-to-generator": "6.7.0",
+                    "babel-plugin-transform-class-properties": "6.6.0",
+                    "babel-plugin-transform-es2015-destructuring": "6.6.5",
+                    "babel-plugin-transform-es2015-function-name": "6.5.0",
+                    "babel-plugin-transform-es2015-modules-commonjs": "6.7.0",
+                    "babel-plugin-transform-es2015-parameters": "6.7.0",
+                    "babel-plugin-transform-es2015-spread": "6.6.5",
+                    "babel-plugin-transform-es2015-sticky-regex": "6.5.0",
+                    "babel-plugin-transform-es2015-unicode-regex": "6.5.0",
+                    "babel-plugin-transform-object-rest-spread": "6.6.5",
                     'babel-plugin-transform-object-assign': '^6.5.0',
                     'babel-preset-es2015': '^6.6.0',
                     'babel-preset-stage-0': '^6.5.0',
@@ -472,7 +481,7 @@ module.exports = yeoman.generators.Base.extend({
                     'imagemin-pngquant': '^4.2.2',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
-                    yargs: '^4.3.2'
+                    yargs: '^4.4.0'
                 },
                 key;
 
@@ -491,7 +500,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testESLint) {
-                packageJSON.devDependencies['babel-eslint'] = '^5.0.0';
+                packageJSON.devDependencies['babel-eslint'] = '^6.0.2';
                 packageJSON.devDependencies['eslint-plugin-react'] = '^4.2.3';
                 packageJSON.devDependencies['eslint-config-airbnb'] = '^6.1.0';
                 packageJSON.devDependencies['gulp-eslint'] = '^2.0.0';
@@ -519,11 +528,11 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.testKarma) {
-                packageJSON.devDependencies['phantomjs'] = '^1.9.19';
+                packageJSON.devDependencies['phantomjs'] = '^1.9.20';
                 packageJSON.devDependencies['karma'] = '^0.13.22';
                 packageJSON.devDependencies['karma-jasmine'] = '^0.3.8';
                 packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.3';
-                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.24';
+                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.25';
                 packageJSON.devDependencies['karma-webpack'] = '^1.7.0';
 
                 packageJSON.devDependencies['jasmine'] = '^2.4.1 ';
@@ -538,7 +547,7 @@ module.exports = yeoman.generators.Base.extend({
             }
 
             if (this.featureAutoprefixer) {
-                packageJSON.devDependencies['autoprefixer'] = '^6.3.3';
+                packageJSON.devDependencies['autoprefixer'] = '^6.3.6';
                 packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
