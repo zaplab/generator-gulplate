@@ -268,39 +268,6 @@ gulp.task('templates', gulpCallBack => {
     });
 });<% } %><% } %>
 
-gulp.task('css', [
-    'test-css',
-], () => {<% if (featureAutoprefixer) { %>
-    const postcss = require('gulp-postcss');
-    const autoprefixer = require('autoprefixer');
-<% } %>
-    return gulp.src('<%= sourcePath %>/css/main.scss')
-        .pipe(gulpif(isDevMode, sourcemaps.init()))
-        .pipe(sass({
-            outputStyle: 'expanded',
-            includePaths: [
-                'node_modules',
-                '<%= sourcePath %>/libs/bower',
-            ],
-        }))<% if (featureAutoprefixer) { %>
-        .pipe(postcss([
-            autoprefixer({
-                browsers: [
-                    'last 2 versions',
-                ],
-            }),
-        ]))<% } %>
-        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
-        .pipe(gulpif(!isDevMode, header(banner, {
-            pkg: pkg,
-        })))
-        .pipe(gulpif(!isDevMode, cssmin({
-            aggressiveMerging: false,
-        })))
-        .pipe(gulp.dest('<%= distributionPath %>/css'))
-        .on('error', onError);
-});
-
 gulp.task('copy:scss', () => {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(gulp.dest('<%= distributionPath %>/scss'))
@@ -563,7 +530,7 @@ gulp.task('default', [
 ], gulpCallback => {
     runSequence(
         [
-            'css',
+            'test-css',
             'copy:scss',
             'js',
             'fonts',
