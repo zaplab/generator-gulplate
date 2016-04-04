@@ -137,19 +137,23 @@ module.exports = yeoman.generators.Base.extend({
 
     prompTransformJs: function ()
     {
-        var done = this.async();
+        this.transformJs = true;
 
-        this.prompt({
-            type: 'confirm',
-            name: 'transformJs',
-            message: 'Transform ES6 to ES5?',
-            default: (this.projectType === 'website') ? true : false
-        }, function (answers) {
-            this.transformJs = answers.transformJs;
-            this.config.set('transformJs', this.transformJs);
+        if (this.projectType === 'module') {
+            var done = this.async();
 
-            done();
-        }.bind(this));
+            this.prompt({
+                type: 'confirm',
+                name: 'transformJs',
+                message: 'Transform JS to ES5?',
+                default: true,
+            }, function (answers) {
+                this.transformJs = answers.transformJs;
+                this.config.set('transformJs', this.transformJs);
+
+                done();
+            }.bind(this));
+        }
     },
 
     promptSourcePathName: function ()

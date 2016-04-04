@@ -1,8 +1,8 @@
 
 import { argv } from 'yargs';
 import del from 'del';
-import gulp from 'gulp';<% if (transformJs) { %>
-import babel from 'gulp-babel';<% } %>
+import gulp from 'gulp';
+import babel from 'gulp-babel';
 import gulpif from 'gulp-if';
 import concat from 'gulp-concat';<% if (testSassLint) { %>
 import sassLint from 'gulp-sass-lint';<% } %>
@@ -370,10 +370,8 @@ gulp.task('js', <% if (testESLint) { %>[
             '<%= sourcePath %>/js/module-a.js',
             '<%= sourcePath %>/js/main.js',
         ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
-        .pipe(babel({
-            modules: 'umd',
-        }))<% } %>
+        .pipe(gulpif(isDevMode, sourcemaps.init()))
+        .pipe(babel())
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {

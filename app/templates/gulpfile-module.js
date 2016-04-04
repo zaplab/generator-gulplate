@@ -327,9 +327,7 @@ gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>() => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
-        .pipe(babel({
-            modules: 'umd',
-        }))<% } %>
+        .pipe(babel())<% } %>
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
@@ -456,9 +454,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             '<%= sourcePath %>/js/main.js',
         ])
         .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
-        .pipe(babel({
-            modules: 'umd',
-        }))<% } %>
+        .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
