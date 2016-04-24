@@ -268,6 +268,22 @@ gulp.task('templates', gulpCallBack => {
     });
 });<% } %><% } %>
 
+gulp.task('html-minify', gulpCallback => {
+    if (isDevMode) {
+        gulpCallback();
+    } else {
+        const htmlmin = require('gulp-htmlmin');
+
+        return gulp.src('<%= documentationPath %>/**/*.html')
+            .pipe(htmlmin({
+                minifyJS: true,
+                minifyCSS: true,
+                collapseWhitespace: true,
+            }))
+            .pipe(gulp.dest('<%= documentationPath %>'));
+    }
+});
+
 gulp.task('copy:scss', () => {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(gulp.dest('<%= distributionPath %>/scss'))
@@ -493,6 +509,7 @@ gulp.task('doc', [
 ], gulpCallback => {
     runSequence(
         'templates',
+        'html-minify',
         [
             'css:doc',
             'js:doc',

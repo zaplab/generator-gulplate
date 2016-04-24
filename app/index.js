@@ -477,6 +477,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-concat': '^2.6.0',
                     'gulp-cssmin': '^0.1.7',
                     'gulp-header': '^1.7.1',
+                    'gulp-htmlmin': '^1.3.0',
                     'gulp-if': '^2.0.0',
                     'gulp-imagemin': '^2.4.0',
                     'gulp-sass': '^2.2.0',

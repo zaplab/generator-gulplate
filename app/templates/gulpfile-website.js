@@ -256,6 +256,22 @@ gulp.task('templates', gulpCallback => {
     });
 });<% } %>
 
+gulp.task('html-minify', gulpCallback => {
+    if (isDevMode) {
+        gulpCallback();
+    } else {
+        const htmlmin = require('gulp-htmlmin');
+
+        return gulp.src('<%= distributionPath %>/**/*.html')
+            .pipe(htmlmin({
+                minifyJS: true,
+                minifyCSS: true,
+                collapseWhitespace: true,
+            }))
+            .pipe(gulp.dest('<%= distributionPath %>'));
+    }
+});
+
 gulp.task('css', [
     'test-css',
 ], () => {<% if (featureAutoprefixer) { %>
@@ -454,7 +470,8 @@ gulp.task('default', [
     'clean',
 ], gulpCallback => {
     runSequence(<% if (htmlMetalsmith || htmlJekyll) { %>
-        'templates',<% } %>
+        'templates',
+        'html-minify',<% } %>
         [
             'css',
             'js',
