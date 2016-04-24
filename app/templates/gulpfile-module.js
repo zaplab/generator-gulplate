@@ -268,37 +268,20 @@ gulp.task('templates', gulpCallBack => {
     });
 });<% } %><% } %>
 
-gulp.task('css', [
-    'test-css',
-], () => {<% if (featureAutoprefixer) { %>
-    const postcss = require('gulp-postcss');
-    const autoprefixer = require('autoprefixer');
-<% } %>
-    return gulp.src('<%= sourcePath %>/css/main.scss')
-        .pipe(gulpif(isDevMode, sourcemaps.init()))
-        .pipe(sass({
-            outputStyle: 'expanded',
-            includePaths: [
-                'node_modules',
-                '<%= sourcePath %>/libs/bower',
-            ],
-        }))<% if (featureAutoprefixer) { %>
-        .pipe(postcss([
-            autoprefixer({
-                browsers: [
-                    'last 2 versions',
-                ],
-            }),
-        ]))<% } %>
-        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
-        .pipe(gulpif(!isDevMode, header(banner, {
-            pkg: pkg,
-        })))
-        .pipe(gulpif(!isDevMode, cssmin({
-            aggressiveMerging: false,
-        })))
-        .pipe(gulp.dest('<%= distributionPath %>/css'))
-        .on('error', onError);
+gulp.task('html-minify', gulpCallback => {
+    if (isDevMode) {
+        gulpCallback();
+    } else {
+        const htmlmin = require('gulp-htmlmin');
+
+        return gulp.src('<%= documentationPath %>/**/*.html')
+            .pipe(htmlmin({
+                minifyJS: true,
+                minifyCSS: true,
+                collapseWhitespace: true,
+            }))
+            .pipe(gulp.dest('<%= documentationPath %>'));
+    }
 });
 
 gulp.task('copy:scss', () => {
@@ -327,9 +310,7 @@ gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>() => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')<% if (transformJs) { %>
-        .pipe(babel({
-            modules: 'umd',
-        }))<% } %>
+        .pipe(babel())<% } %>
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
         })))
@@ -456,9 +437,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
             '<%= sourcePath %>/js/main.js',
         ])
         .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
-        .pipe(babel({
-            modules: 'umd',
-        }))<% } %>
+        .pipe(babel())<% } %>
         .pipe(concat('main.js'))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
@@ -530,6 +509,7 @@ gulp.task('doc', [
 ], gulpCallback => {
     runSequence(
         'templates',
+        'html-minify',
         [
             'css:doc',
             'js:doc',
@@ -567,7 +547,7 @@ gulp.task('default', [
 ], gulpCallback => {
     runSequence(
         [
-            'css',
+            'test-css',
             'copy:scss',
             'js',
             'fonts',
