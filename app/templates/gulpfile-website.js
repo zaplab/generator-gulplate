@@ -284,7 +284,6 @@ gulp.task('css', [
             outputStyle: 'expanded',
             includePaths: [
                 'node_modules',
-                '<%= sourcePath %>/libs/bower',
             ],
         }))<% if (featureAutoprefixer) { %>
         .pipe(postcss([

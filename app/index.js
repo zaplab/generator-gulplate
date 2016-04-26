@@ -415,9 +415,7 @@ module.exports = yeoman.generators.Base.extend({
                         url : 'http://www.author.url'
                     },
                     dependencies: {},
-                    devDependencies: {
-                        bower: '^1.7.8'
-                    }
+                    devDependencies: {},
                 },
                 gulpModules = {
                     'babel-core': '^6.7.0',

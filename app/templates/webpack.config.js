@@ -19,7 +19,6 @@ export default {
         },
         modulesDirectories: [
             '<%= sourcePath %>/js',
-            '<%= sourcePath %>/libs/bower',
             'node_modules',
         ],
     },
@@ -28,7 +27,6 @@ export default {
         root: __dirname,
         modulesDirectories: [
             '<%= sourcePath %>/js',
-            '<%= sourcePath %>/libs/bower',
             'node_modules',
         ],
     },
