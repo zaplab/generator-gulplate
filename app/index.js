@@ -324,38 +324,6 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
 
-    promptModuleLoaders: function ()
-    {
-        if (this.addDocumentation || (this.projectType === 'website')) {
-            var done = this.async(),
-                prompts = {
-                    type: 'list',
-                    name: 'module-loader',
-                    message: (this.addDocumentation && (this.projectType === 'module')) ? 'Module Loader for Documentation:' : 'Module Loader:',
-                    choices: [
-                        {
-                            name: 'None',
-                            value: 'none'
-                        },
-                        {
-                            name: 'Webpack',
-                            value: 'webpack'
-                        }
-                    ],
-                    default: 'webpack'
-                };
-
-            this.prompt(prompts, function (answers) {
-                this.moduleLoader = answers['module-loader'];
-                this.config.set('module-loader', this.moduleLoader);
-
-                done();
-            }.bind(this));
-        } else {
-            this.moduleLoader = 'none';
-        }
-    },
-
     promptFeatures: function ()
     {
         var done = this.async(),
@@ -486,7 +454,9 @@ module.exports = yeoman.generators.Base.extend({
                     'imagemin-pngquant': '^4.2.2',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
-                    yargs: '^4.4.0'
+                    yargs: '^4.4.0',
+                    'babel-loader': '^6.2.4',
+                    webpack: '^1.13.0',
                 },
                 key;
 
@@ -509,11 +479,6 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.devDependencies['eslint-plugin-react'] = '^4.2.3';
                 packageJSON.devDependencies['eslint-config-airbnb'] = '^6.1.0';
                 packageJSON.devDependencies['gulp-eslint'] = '^2.0.0';
-            }
-
-            if ((this.moduleLoader == 'webpack') || this.testKarma) {
-                packageJSON.devDependencies['babel-loader'] = '^6.2.4';
-                packageJSON.devDependencies['webpack'] = '^1.12.14';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
@@ -616,6 +581,10 @@ module.exports = yeoman.generators.Base.extend({
             }
         },
 
+        webpack: function () {
+            this.copy('webpack.config.js');
+        },
+
         test: function () {
             if (this.testKarma) {
                 this.mkdir(this.testsPath + '/spec');
@@ -623,7 +592,6 @@ module.exports = yeoman.generators.Base.extend({
                 this.copy('tests/spec/main.js', this.testsPath + '/spec/main.js');
                 this.copy('tests/specs.html', this.testsPath + '/specs.html');
                 this.copy('karma.conf.js');
-                this.copy('webpack.config.js');
             }
         }
     },

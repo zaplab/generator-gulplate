@@ -16,9 +16,9 @@ import sourcemaps from 'gulp-sourcemaps';
 import browserSync from 'browser-sync';
 import runSequence from 'run-sequence';
 import header from 'gulp-header';
-import eventStream from 'event-stream';<% if ((moduleLoader == "webpack") || testKarma) { %>
+import eventStream from 'event-stream';
 import gutil from 'gulp-util';
-import webpack from 'webpack';<% } %><% if (featureModernizr) { %>
+import webpack from 'webpack';<% if (featureModernizr) { %>
 import modernizr from 'gulp-modernizr';<% } %>
 import path from 'path';
 
@@ -377,7 +377,7 @@ gulp.task('css:doc', [
 
 gulp.task('js:doc', <% if (testESLint) { %>[
     'eslint',
-], <% } %>(<% if (moduleLoader == "webpack") { %>gulpCallback<% } %>) => {<% if (moduleLoader == "webpack") { %>
+], <% } %>gulpCallback => {
     const webpackConfig = {
         context: __dirname,
         entry: '<%= sourcePath %>/doc/js/main.js',
@@ -431,26 +431,7 @@ gulp.task('js:doc', <% if (testESLint) { %>[
         });
 
         gulpCallback();
-    });<% } %><% if (moduleLoader == "none") { %>
-    return gulp.src([
-            '<%= sourcePath %>/js/module-a.js',
-            '<%= sourcePath %>/js/main.js',
-        ])
-        .pipe(gulpif(isDevMode, sourcemaps.init()))<% if (transformJs) { %>
-        .pipe(babel())<% } %>
-        .pipe(concat('main.js'))
-        .pipe(gulpif(isDevMode, sourcemaps.write('./')))
-        .pipe(gulpif(!isDevMode, header(banner, {
-            pkg: pkg,
-        })))
-        .pipe(gulpif(!isDevMode, uglify({
-            preserveComments: 'some',
-        })))
-        .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
-        .pipe(gulpif(isServeTask, browserSync.reload({
-            match: '**/*.js',
-        })))
-        .on('error', onError);<% } %>
+    });
 });
 
 gulp.task('fonts:doc', () => {
