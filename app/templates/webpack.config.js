@@ -1,8 +1,7 @@
 
-var path = require('path');
-var webpack = require('webpack');
+import path from 'path';
 
-module.exports = {
+export default {
     module: {
         loaders: [
             {
