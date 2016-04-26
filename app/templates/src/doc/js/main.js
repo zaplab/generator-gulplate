@@ -1,5 +1,5 @@
 
-import * as moduleA from '../../js/module-a';
+import moduleA from '../../js/module-a';
 
 console.log('gulplate doc');
-moduleA.log();
+console.log('gulplate', moduleA.hello());
