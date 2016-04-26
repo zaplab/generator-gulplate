@@ -378,40 +378,15 @@ gulp.task('css:doc', [
 gulp.task('js:doc', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>gulpCallback => {
-    const webpackConfig = {
+    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
         context: __dirname,
         entry: '<%= sourcePath %>/doc/js/main.js',
         output: {
             path: '<%= documentationPath %>/resources/js/',
             filename: 'main.js',
         },
-        module: {
-            loaders: [
-                {
-                    test: /\.js?$/,
-                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
-                    loader: 'babel-loader',
-                },
-            ],
-        },
-        resolve: {
-            root: __dirname,
-            modulesDirectories: [
-                '<%= sourcePath %>/js',
-                '<%= sourcePath %>/libs/bower',
-                'node_modules',
-            ],
-        },
-        resolveLoader: {
-            root: path.join(__dirname, 'node_modules'),
-        },
-        plugins: [
-            new webpack.ResolverPlugin(
-                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-            ),
-        ],
         devtool: isDevMode ? 'sourcemap' : '',
-    };
+    });
 
     if (!isDevMode) {
         webpackConfig.plugins = webpackConfig.plugins.concat(

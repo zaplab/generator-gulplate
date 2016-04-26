@@ -6,13 +6,10 @@ export default {
         loaders: [
             {
                 test: /\.js?$/,
-                include: [
-                    path.resolve(__dirname, '<%= testsPath %>/spec'),
-                    path.resolve(__dirname, '<%= sourcePath %>'),
-                ],
+                exclude: /node_modules/,
                 loader: 'babel',
-            }
-        ]
+            },
+        ],
     },
 
     resolve: {

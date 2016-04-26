@@ -43,7 +43,20 @@ module.exports = function (config) {
             'spec',
         ],
 
-        webpack: require('./webpack.config.js'),
+        webpack: Object.assign({}, require('./webpack.config.js'), {
+            module: {
+                loaders: [
+                    {
+                        test: /\.js?$/,
+                        include: [
+                            path.resolve(__dirname, '<%= testsPath %>/spec'),
+                            path.resolve(__dirname, '<%= sourcePath %>'),
+                        ],
+                        loader: 'babel',
+                    },
+                ],
+            },
+        }),
 
         webpackMiddleware: {
             stats: {

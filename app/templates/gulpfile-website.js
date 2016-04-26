@@ -326,40 +326,15 @@ gulp.task('modernizr', () => {
 gulp.task('js', <% if (testESLint) { %>[
     'eslint',
 ], <% } %>gulpCallback => {
-    const webpackConfig = {
+    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {
             path: '<%= distributionPath %>/resources/js/',
             filename: 'main.js',
         },
-        module: {
-            loaders: [
-                {
-                    test: /\.jsx?$/,
-                    exclude: /(node_modules|<%= sourcePath %>\/libs\/bower)/,
-                    loader: 'babel',
-                },
-            ],
-        },
-        resolve: {
-            root: __dirname,
-            modulesDirectories: [
-                '<%= sourcePath %>/js',
-                '<%= sourcePath %>/libs/bower',
-                'node_modules',
-            ],
-        },
-        resolveLoader: {
-            root: path.join(__dirname, 'node_modules'),
-        },
-        plugins: [
-            new webpack.ResolverPlugin(
-                new webpack.ResolverPlugin.DirectoryDescriptionFilePlugin('bower.json', ['main'])
-            ),
-        ],
         devtool: isDevMode ? 'sourcemap' : '',
-    };
+    });
 
     if (!isDevMode) {
         webpackConfig.plugins = webpackConfig.plugins.concat(
