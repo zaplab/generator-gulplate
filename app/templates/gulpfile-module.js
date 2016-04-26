@@ -203,7 +203,7 @@ gulp.task('test-js', [<% if (testESLint) { %>
 gulp.task('test', [<% if (testSassLint) { %>
     'test-css',<% } %>
     'test-js',
-]);<% if (addDocumentation) { %><% if (docMetalsmith) { %>
+]);<% if (addDocumentation) { %>
 
 gulp.task('templates', () => {
     const metalsmith = require('gulp-metalsmith');
@@ -249,24 +249,7 @@ gulp.task('templates', () => {
         .pipe(gulpif(isServeTask, browserSync.reload({
             stream: true,
         })));
-});<% } %><% if (docJekyll) { %>
-gulp.task('templates', gulpCallBack => {
-    const spawn = require('child_process').spawn;
-    const jekyll = spawn('bundler', [
-        'exec',
-        'jekyll',
-        'build',
-        '--source', '<%= sourcePath %>/doc/templates',
-        '--destination', '<%= documentationPath %>',
-    ], {
-        stdio: 'inherit',
-    });
-
-    jekyll.on('exit', code => {
-        browserSync.reload();
-        gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
-    });
-});<% } %><% } %>
+});<% } %>
 
 gulp.task('html-minify', gulpCallback => {
     if (isDevMode) {

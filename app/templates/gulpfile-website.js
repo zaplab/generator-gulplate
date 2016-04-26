@@ -190,7 +190,7 @@ gulp.task('test-js', [<% if (testESLint) { %>
 gulp.task('test', [
     <% if (testSassLint) { %>'test-css',<% } %>
     'test-js',
-]);<% if (htmlMetalsmith) { %>
+]);
 
 gulp.task('templates', () => {
     const metalsmith = require('gulp-metalsmith');
@@ -236,25 +236,7 @@ gulp.task('templates', () => {
         .pipe(gulpif(isServeTask, browserSync.reload({
             stream: true,
         })));
-});<% } %><% if (htmlJekyll) { %>
-
-gulp.task('templates', gulpCallback => {
-    const spawn = require('child_process').spawn;
-    const jekyll = spawn('bundler', [
-        'exec',
-        'jekyll',
-        'build',
-        '--source', '<%= sourcePath %>/templates',
-        '--destination', '<%= distributionPath %>',
-    ], {
-        stdio: 'inherit',
-    });
-
-    jekyll.on('exit', code => {
-        browserSync.reload();
-        gulpCallBack(code === 0 ? null : 'ERROR: Jekyll process exited with code: ' + code);
-    });
-});<% } %>
+});
 
 gulp.task('html-minify', gulpCallback => {
     if (isDevMode) {
@@ -385,10 +367,11 @@ gulp.task('images', () => {
 gulp.task('watch', () => {
     gulp.watch('<%= sourcePath %>/css/**/*.scss', ['css']);
     gulp.watch('<%= sourcePath %>/js/**/*.js', ['js']);
-    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images']);<% if (htmlMetalsmith || htmlJekyll) { %>
+    gulp.watch('<%= sourcePath %>/img/**/*.{gif,jpg,png,svg}', ['images']);
     gulp.watch('<%= sourcePath %>/templates/**/*.html', () => {
         runSequence(
             'templates',
+            'html-minify',
             [
                 'css',
                 'js',
@@ -397,7 +380,7 @@ gulp.task('watch', () => {
             ]<% if (featureModernizr) { %>,
             'modernizr'<% } %>
         );
-    });<% } %>
+    });
 });
 
 gulp.task('_serve', [
@@ -424,9 +407,9 @@ gulp.task('serve', () => {
 gulp.task('default', [
     'clean',
 ], gulpCallback => {
-    runSequence(<% if (htmlMetalsmith || htmlJekyll) { %>
+    runSequence(
         'templates',
-        'html-minify',<% } %>
+        'html-minify',
         [
             'css',
             'js',

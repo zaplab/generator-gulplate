@@ -41,13 +41,7 @@ module.exports = yeoman.generators.Base.extend({
             defaults: false
         });
 
-        this.htmlMetalsmith = false;
-        this.htmlJekyll = false;
-
         this.addDocumentation = false;
-
-        this.docMetalsmith = false;
-        this.docJekyll = false;
     },
 
     promptProjectName: function ()
@@ -96,43 +90,6 @@ module.exports = yeoman.generators.Base.extend({
 
             done();
         }.bind(this));
-    },
-
-    prompHTML: function ()
-    {
-        if (this.projectType === 'website') {
-            var done = this.async();
-
-            this.prompt({
-                type: 'list',
-                name: 'html',
-                message: 'HTML Template',
-                choices: [
-                    {
-                        name: 'Basic index.html',
-                        value: 'basic'
-                    },
-                    {
-                        name: 'Use Metalsmith (node)',
-                        value: 'metalsmith'
-                    },
-                    {
-                        name: 'Use Jekyll (ruby)',
-                        value: 'jekyll'
-                    }
-                ],
-                default: 'basic'
-            }, function (answers) {
-                this.htmlBasic = (answers.html === 'basic');
-                this.htmlMetalsmith = (answers.html === 'metalsmith');
-                this.htmlJekyll = (answers.html === 'jekyll');
-                this.config.set('htmlBasic', this.htmlBasic);
-                this.config.set('htmlMetalsmith', this.htmlMetalsmith);
-                this.config.set('htmlJekyll', this.htmlJekyll);
-
-                done();
-            }.bind(this));
-        }
     },
 
     prompTransformJs: function ()
@@ -225,37 +182,6 @@ module.exports = yeoman.generators.Base.extend({
                 this.documentationPath = answers['doc-path'];
                 this.documentationPath = this._.slugify(this.documentationPath);
                 this.config.set('docPath', this.documentationPath);
-
-                done();
-            }.bind(this));
-        }
-    },
-
-    promptDocumentationFramework: function ()
-    {
-        if (this.addDocumentation) {
-            var done = this.async();
-
-            this.prompt({
-                type: 'list',
-                name: 'doc-framework',
-                message: 'Documentation Site-Generator',
-                choices: [
-                    {
-                        name: 'Metalsmith (node)',
-                        value: 'metalsmith'
-                    },
-                    {
-                        name: 'Jekyll (ruby)',
-                        value: 'jekyll'
-                    }
-                ],
-                default: 'metalsmith'
-            }, function (answers) {
-                this.docMetalsmith = (answers['doc-framework'] === 'metalsmith');
-                this.docJekyll = (answers['doc-framework'] === 'jekyll');
-                this.config.set('docMetalsmith', this.docMetalsmith);
-                this.config.set('docJekyll', this.docJekyll);
 
                 done();
             }.bind(this));
@@ -464,6 +390,12 @@ module.exports = yeoman.generators.Base.extend({
                 }
             }
 
+            packageJSON.devDependencies['gulp-metalsmith'] = '^1.0.0';
+            packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
+            packageJSON.devDependencies['metalsmith-path'] = '^0.2.0';
+            packageJSON.devDependencies['metalsmith-layouts'] = '^1.6.4';
+            packageJSON.devDependencies['handlebars'] = '^4.0.5';
+
             if (this.projectType === 'module') {
                 packageJSON.main = this.distributionPath + '/js/main.js';
             }
@@ -485,14 +417,6 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.addDocumentation) {
                 packageJSON.devDependencies['prismjs'] = '^1.4.1';
-            }
-
-            if (this.htmlMetalsmith || this.docMetalsmith) {
-                packageJSON.devDependencies['gulp-metalsmith'] = '^1.0.0';
-                packageJSON.devDependencies['metalsmith-markdown'] = '^0.2.1';
-                packageJSON.devDependencies['metalsmith-path'] = '^0.2.0';
-                packageJSON.devDependencies['metalsmith-layouts'] = '^1.6.4';
-                packageJSON.devDependencies['handlebars'] = '^4.0.5';
             }
 
             if (this.testKarma) {
@@ -543,10 +467,6 @@ module.exports = yeoman.generators.Base.extend({
 
         dist: function () {
             this.mkdir(this.distributionPath);
-
-            if (this.htmlBasic) {
-                this.copy('src/index.html', this.distributionPath + '/index.html');
-            }
         },
 
         doc: function () {
@@ -559,24 +479,14 @@ module.exports = yeoman.generators.Base.extend({
         templates: function () {
             var extraPath = '';
 
-            if (this.htmlMetalsmith || this.htmlJekyll || this.addDocumentation) {
-                if (this.addDocumentation) {
-                    extraPath = '/doc';
-                }
-
-                if (this.htmlMetalsmith || this.docMetalsmith) {
-                    this.copy('src/templates/metalsmith/index.html', this.sourcePath + extraPath + '/templates/index.html');
-                    this.copy('src/templates/metalsmith/subpage.html', this.sourcePath + extraPath + '/templates/subpage.html');
-                    this.copy('src/templates/metalsmith/_layouts/default.html', this.sourcePath + extraPath + '/templates/_layouts/default.html');
-                    this.copy('src/templates/metalsmith/_includes/main-navigation.html', this.sourcePath + extraPath + '/templates/_includes/main-navigation.html');
-                } else if (this.htmlJekyll || this.docJekyll) {
-                    this.copy('src/templates/jekyll/index.html', this.sourcePath + extraPath + '/templates/index.html');
-                    this.copy('src/templates/jekyll/subpage.html', this.sourcePath + extraPath + '/templates/subpage.html');
-                    this.copy('src/templates/jekyll/_layouts/default.html', this.sourcePath + extraPath + '/templates/_layouts/default.html');
-                    this.copy('src/templates/jekyll/_includes/main-navigation.html', this.sourcePath + extraPath + '/templates/_includes/main-navigation.html');
-                    this.copy('src/templates/jekyll/_config.yml', this.sourcePath + extraPath + '/templates/_config.yml');
-                }
+            if (this.addDocumentation) {
+                extraPath = '/doc';
             }
+
+            this.copy('src/templates/index.html', this.sourcePath + extraPath + '/templates/index.html');
+            this.copy('src/templates/subpage.html', this.sourcePath + extraPath + '/templates/subpage.html');
+            this.copy('src/templates/_layouts/default.html', this.sourcePath + extraPath + '/templates/_layouts/default.html');
+            this.copy('src/templates/_includes/main-navigation.html', this.sourcePath + extraPath + '/templates/_includes/main-navigation.html');
         },
 
         webpack: function () {
