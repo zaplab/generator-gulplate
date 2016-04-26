@@ -12,6 +12,8 @@ export default {
         ],
     },
 
+    plugins: [],
+
     resolve: {
         root: __dirname,
         alias: {
