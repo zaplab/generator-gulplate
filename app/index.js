@@ -484,6 +484,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
                     'imagemin-pngquant': '^4.2.2',
+                    'node-sass': '3.4.2',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
                     yargs: '^4.4.0'
