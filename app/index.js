@@ -16,25 +16,6 @@ module.exports = yeoman.generators.Base.extend({
         this.projectName = this['project-name'] || 'project-name';
         this.projectName = this._.slugify(this.projectName);
 
-        // settings:
-        this.option('settings-min-files', {
-            type: Boolean,
-            desc: 'Generate extra .min files for css & js files. Or just minify without extra file.',
-            defaults: false
-        });
-
-        this.option('settings-documentation', {
-            type: Boolean,
-            desc: 'Add Documentation (Jekyll)',
-            defaults: false
-        });
-
-        this.option('settings-tests', {
-            type: Boolean,
-            desc: 'Add Tests (CSS Lint, ESLint and Mocha & Chai)',
-            defaults: true
-        });
-
         this.option('skip-install', {
             type: Boolean,
             desc: 'Skip the npm and maybe gem installations',
