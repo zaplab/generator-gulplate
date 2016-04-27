@@ -3,6 +3,12 @@ generator-gulplate
 
 yeoman generator for the basic structure of a web project with a gulp template
 
+## Install
+
+```
+$ npm install -g generator-gulplate
+```
+
 ## Usage
 
 ```
@@ -16,6 +22,8 @@ $ yo gulplate
 ```
 
 ## What you get
+
+### those gulp tasks
 
 ```
 $ gulp
@@ -39,17 +47,14 @@ your choices:
 
 ### If Project-Type is "Website":
 
-get a dummy html template (index.html) in dist
-
 ```
 .
 ├── dist
-│   ├── resources
-│   │   ├── css
-│   │   ├── fonts
-│   │   ├── img
-│   │   └── js
-│   └── index.html
+│   └── resources
+│       ├── css
+│       ├── fonts
+│       ├── img
+│       └── js
 ├── src
 │   ├── css
 │   │   ├── _functions.scss
@@ -61,32 +66,22 @@ get a dummy html template (index.html) in dist
 │   ├── js
 │   │   ├── main.js
 │   │   └── module-a.js
-│   └── libs
-│       └── bower
+│   └── templates
+│       ├── _includes
+│       │   └── main-navigation.html
+│       ├── _layouts
+│       │   └── default.html
+│       ├── index.html
+│       └── subpage.html
 ├── tests
-│   ├── .jshintrc
-│   └── sass-lint.yml
-├── .bowerrc
+│   ├── .eslintrc
+│   └── .sass-lint.yml
+├── .babelrc
 ├── .editorconfig
 ├── .gitignore
-├── bower.json
-├── gulpfile.js
-└── package.json
-```
-
-or instead of the dummy index.html you can also use metalsmith (node) as static site builders.
-the following folders / files will be added
-
-```
-.
-└── src
-    └── templates
-        ├── _includes
-        │   └── main-navigation.html
-        ├── _layouts
-        │   └── default.html
-        ├── index.html
-        └── subpage.html
+├── gulpfile.babel.js
+├── package.json
+└── webpack.config.js
 ```
 
 ### If Project-Type is "Module/Plugin/Library":
@@ -106,20 +101,18 @@ the following folders / files will be added
 │   │   └── main.scss
 │   ├── fonts
 │   ├── img
-│   ├── js
-│   │   ├── main.js
-│   │   └── module-a.js
-│   └── libs
-│       └── bower
+│   └── js
+│       ├── main.js
+│       └── module-a.js
 ├── tests
-│   ├── .jshintrc
-│   └── sass-lint.yml
-├── .bowerrc
+│   ├── .eslintrc
+│   └── .sass-lint.yml
+├── .babelrc
 ├── .editorconfig
 ├── .gitignore
-├── bower.json
-├── gulpfile.js
-└── package.json
+├── gulpfile.babel.js
+├── package.json
+└── webpack.config.js
 ```
 
 If you want to add a Documentation for your "Module/Plugin/Library"
@@ -128,20 +121,19 @@ the following folders / files will be added
 ```
 .
 ├── doc
-├── src
-│   └── doc
-│       ├── css
-│       │   └── main.scss
-│       ├── templates
-│       │   ├── _includes
-│       │   │   └── main-navigation.html
-│       │   ├── _layouts
-│       │   │   └── default.html
-│       │   ├── index.html
-│       │   └── subpage.html
-│       └── js
-│           └── main.js
-└── [Gemfile]
+└── src
+    └── doc
+        ├── css
+        │   └── main.scss
+        ├── templates
+        │   ├── _includes
+        │   │   └── main-navigation.html
+        │   ├── _layouts
+        │   │   └── default.html
+        │   ├── index.html
+        │   └── subpage.html
+        └── js
+            └── main.js
 ```
 
 and the following gulp task
@@ -159,8 +151,7 @@ $ gulp doc
 │   ├── spec
 │   │   └── ...
 │   └── specs.html
-├── karma.config.js
-└── webpack-karma.config.js
+└── karma.config.js
 ```
 
 and the following gulp task
