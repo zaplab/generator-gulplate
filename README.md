@@ -74,20 +74,19 @@ get a dummy html template (index.html) in dist
 └── package.json
 ```
 
-or instead of the dummy index.html you can also use metalsmith (node) or jekyll (ruby) as static site builders.
+or instead of the dummy index.html you can also use metalsmith (node) as static site builders.
 the following folders / files will be added
 
 ```
 .
-├── src
-│   └── templates
-│       ├── _includes
-│       │   └── main-navigation.html
-│       ├── _layouts
-│       │   └── default.html
-│       ├── index.html
-│       └── subpage.html
-└── [Gemfile]
+└── src
+    └── templates
+        ├── _includes
+        │   └── main-navigation.html
+        ├── _layouts
+        │   └── default.html
+        ├── index.html
+        └── subpage.html
 ```
 
 ### If Project-Type is "Module/Plugin/Library":

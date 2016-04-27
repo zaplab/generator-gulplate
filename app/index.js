@@ -6,7 +6,6 @@ var yeoman = require('yeoman-generator'),
 module.exports = yeoman.generators.Base.extend({
     constructor: function ()
     {
-        // Calling the super constructor is important so our generator is correctly set up
         yeoman.generators.Base.apply(this, arguments);
 
         this.argument('project-name', {
@@ -18,7 +17,7 @@ module.exports = yeoman.generators.Base.extend({
 
         this.option('skip-install', {
             type: Boolean,
-            desc: 'Skip the npm and maybe gem installations',
+            desc: 'Skip the npm installations',
             defaults: false
         });
 
@@ -283,12 +282,6 @@ module.exports = yeoman.generators.Base.extend({
             this.copy('editorconfig', '.editorconfig');
         },
 
-        gem: function () {
-            if (this.htmlJekyll || this.docJekyll) {
-                this.template('Gemfile');
-            }
-        },
-
         git: function () {
             this.template('gitignore', '.gitignore');
         },
@@ -493,20 +486,11 @@ module.exports = yeoman.generators.Base.extend({
                 installInfo += chalk.yellow.bold('gulp setup');
             }
 
-            if (this.htmlJekyll || this.docJekyll) {
-                installInfo += chalk.yellow.bold(' && bundler install');
-            }
-
             this.log(installInfo);
             this.log('Then:\n> ' + chalk.yellow.bold('gulp serve'));
         } else {
             this.installDependencies({
                 bower: false,
-                callback: function () {
-                    if (this.htmlJekyll || this.docJekyll) {
-                        this.spawnCommand('bundler', ['install']);
-                    }
-                }.bind(this)
             });
         }
     }
