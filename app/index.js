@@ -454,8 +454,6 @@ module.exports = yeoman.generators.Base.extend({
         source: function () {
             this.mkdir(this.sourcePath);
             this.mkdir(this.sourcePath + '/css');
-            this.mkdir(this.sourcePath + '/fonts');
-            this.mkdir(this.sourcePath + '/img');
             this.mkdir(this.sourcePath + '/js');
 
             this.copy('src/js/main.js', this.sourcePath + '/js/main.js');
