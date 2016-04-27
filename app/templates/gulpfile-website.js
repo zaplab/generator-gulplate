@@ -256,10 +256,10 @@ gulp.task('html-minify', gulpCallback => {
 
 gulp.task('css', [
     'test-css',
-], () => {<% if (featureAutoprefixer) { %>
+], () => {
     const postcss = require('gulp-postcss');
     const autoprefixer = require('autoprefixer');
-<% } %>
+
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
         .pipe(sass({
@@ -267,14 +267,14 @@ gulp.task('css', [
             includePaths: [
                 'node_modules',
             ],
-        }))<% if (featureAutoprefixer) { %>
+        }))
         .pipe(postcss([
             autoprefixer({
                 browsers: [
                     'last 2 versions',
                 ],
             }),
-        ]))<% } %>
+        ]))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,

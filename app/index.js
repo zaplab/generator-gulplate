@@ -239,11 +239,6 @@ module.exports = yeoman.generators.Base.extend({
                 message: 'Extras',
                 choices: [
                     {
-                        name: 'Use Autoprefixer',
-                        value: 'autoprefixer',
-                        checked: true
-                    },
-                    {
                         name: 'Use Modernizr',
                         value: 'modernizr',
                         checked: true
@@ -258,9 +253,7 @@ module.exports = yeoman.generators.Base.extend({
 
         this.prompt(prompts, function (answers) {
             var features = answers.features;
-            this.featureAutoprefixer = hasFeature(features, 'autoprefixer');
             this.featureModernizr = hasFeature(features, 'modernizr');
-            this.config.set('featureAutoprefixer', this.featureAutoprefixer);
             this.config.set('featureModernizr', this.featureModernizr);
 
             done();
@@ -318,6 +311,7 @@ module.exports = yeoman.generators.Base.extend({
                     devDependencies: {},
                 },
                 gulpModules = {
+                    autoprefixer: '^6.3.6',
                     'babel-core': '^6.7.0',
                     "babel-plugin-add-module-exports": "^0.1.2",
                     "babel-plugin-transform-async-to-generator": "6.7.0",
@@ -346,6 +340,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-htmlmin': '^1.3.0',
                     'gulp-if': '^2.0.0',
                     'gulp-imagemin': '^2.4.0',
+                    'gulp-postcss': '^6.1.0',
                     'gulp-sass': '^2.2.0',
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
@@ -411,11 +406,6 @@ module.exports = yeoman.generators.Base.extend({
                 packageJSON.scripts = {
                     test: 'karma start',
                 };
-            }
-
-            if (this.featureAutoprefixer) {
-                packageJSON.devDependencies['autoprefixer'] = '^6.3.6';
-                packageJSON.devDependencies['gulp-postcss'] = '^6.0.1';
             }
 
             if (this.featureModernizr) {
