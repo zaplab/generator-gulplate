@@ -4,12 +4,12 @@ import del from 'del';
 import gulp from 'gulp';
 import babel from 'gulp-babel';
 import gulpif from 'gulp-if';
-import concat from 'gulp-concat';<% if (testSassLint) { %>
-import sassLint from 'gulp-sass-lint';<% } %>
+import concat from 'gulp-concat';
+import sassLint from 'gulp-sass-lint';
 import cssmin from 'gulp-cssmin';
 import imagemin from 'gulp-imagemin';
-import pngquant from 'imagemin-pngquant';<% if (testESLint) { %>
-import eslint from 'gulp-eslint';<% } %>
+import pngquant from 'imagemin-pngquant';
+import eslint from 'gulp-eslint';
 import uglify from 'gulp-uglify';
 import sass from 'gulp-sass';
 import sourcemaps from 'gulp-sourcemaps';
@@ -93,7 +93,7 @@ gulp.task('clean', gulpCallback => {
     ]).then(() => {
         gulpCallback();
     });
-});<% if (testESLint) { %>
+});
 
 gulp.task('eslint', () => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
@@ -102,7 +102,7 @@ gulp.task('eslint', () => {
         }))
         .pipe(eslint.format())
         .on('error', onWarning);
-});<% } %><% if (testKarma) { %>
+});<% if (testKarma) { %>
 
 // for easier debugging of the generated spec bundle
 gulp.task('specs:debug', gulpCallback => {
@@ -182,8 +182,8 @@ gulp.task('test-css', () => {
         .on('error', onWarning);
 });<% } %>
 
-gulp.task('test-js', [<% if (testESLint) { %>
-    'eslint',<% } %><% if (testKarma) { %>
+gulp.task('test-js', [
+    'eslint',<% if (testKarma) { %>
     'specs',<% } %>
 ]);
 
@@ -304,9 +304,9 @@ gulp.task('modernizr', () => {
         .pipe(gulp.dest('<%= distributionPath %>/resources/js'))
 });<% } %>
 
-gulp.task('js', <% if (testESLint) { %>[
+gulp.task('js', [
     'eslint',
-], <% } %>gulpCallback => {
+], gulpCallback => {
     const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',

@@ -181,16 +181,6 @@ module.exports = yeoman.generators.Base.extend({
             message: 'Tests',
             choices: [
                 {
-                    name: 'SASS Lint',
-                    value: 'sasslint',
-                    checked: true
-                },
-                {
-                    name: 'ESLint',
-                    value: 'eslint',
-                    checked: true
-                },
-                {
                     name: 'Karma & Jasmine',
                     value: 'karma',
                     checked: true
@@ -199,11 +189,7 @@ module.exports = yeoman.generators.Base.extend({
         }, function (answers) {
             var features = answers.tests;
 
-            this.testSassLint = hasFeature(features, 'sasslint');
-            this.testESLint = hasFeature(features, 'eslint');
             this.testKarma = hasFeature(features, 'karma');
-            this.config.set('testSassLint', this.testSassLint);
-            this.config.set('testESLint', this.testESLint);
             this.config.set('testKarma', this.testKarma);
 
             done();
@@ -212,22 +198,20 @@ module.exports = yeoman.generators.Base.extend({
 
     promptTestsPath: function ()
     {
-        if (this.testSassLint || this.testESLint || this.testKarma) {
-            var done = this.async();
+        var done = this.async();
 
-            this.prompt({
-                type: 'input',
-                name: 'tests-path',
-                message: 'Tests Path',
-                default: 'tests'
-            }, function (answers) {
-                this.testsPath = answers['tests-path'];
-                this.testsPath = this._.slugify(this.testsPath);
-                this.config.set('testsPath', this.testsPath);
+        this.prompt({
+            type: 'input',
+            name: 'tests-path',
+            message: 'Tests Path',
+            default: 'tests'
+        }, function (answers) {
+            this.testsPath = answers['tests-path'];
+            this.testsPath = this._.slugify(this.testsPath);
+            this.config.set('testsPath', this.testsPath);
 
-                done();
-            }.bind(this));
-        }
+            done();
+        }.bind(this));
     },
 
     promptFeatures: function ()
@@ -266,9 +250,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         sasslint: function () {
-            if (this.testSassLint) {
-                this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
-            }
+            this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
         },
 
         editorConfig: function () {
@@ -288,9 +270,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         eslint: function () {
-            if (this.testESLint) {
-                this.copy('tests/eslintrc', this.testsPath + '/.eslintrc');
-            }
+            this.copy('tests/eslintrc', this.testsPath + '/.eslintrc');
         },
 
         modules: function () {
@@ -327,6 +307,10 @@ module.exports = yeoman.generators.Base.extend({
                     'babel-plugin-transform-object-assign': '^6.5.0',
                     'babel-preset-es2015': '^6.6.0',
                     'babel-preset-stage-0': '^6.5.0',
+                    'babel-eslint': '^6.0.4',
+                    'eslint-config-airbnb': '^8.0.0',
+                    'eslint-plugin-react': '^5.0.1',
+                    'gulp-eslint': '^2.0.0',
                     'breakpoint-sass': '^2.7.0',
                     'compass-mixins': '^0.12.7',
                     del: '^2.2.0',
@@ -342,6 +326,7 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-imagemin': '^2.4.0',
                     'gulp-postcss': '^6.1.0',
                     'gulp-sass': '^2.2.0',
+                    'gulp-sass-lint': '^1.1.1',
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
                     'imagemin-pngquant': '^4.2.2',
@@ -368,17 +353,6 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.projectType === 'module') {
                 packageJSON.main = this.distributionPath + '/js/main.js';
-            }
-
-            if (this.testSassLint) {
-                packageJSON.devDependencies['gulp-sass-lint'] = '^1.1.1';
-            }
-
-            if (this.testESLint) {
-                packageJSON.devDependencies['babel-eslint'] = '^6.0.2';
-                packageJSON.devDependencies['eslint-plugin-react'] = '^4.2.3';
-                packageJSON.devDependencies['eslint-config-airbnb'] = '^6.1.0';
-                packageJSON.devDependencies['gulp-eslint'] = '^2.0.0';
             }
 
             if ((this.projectType === 'website') || this.addDocumentation) {
