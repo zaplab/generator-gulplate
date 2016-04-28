@@ -4,7 +4,6 @@ import del from 'del';
 import gulp from 'gulp';<% if (transformJs) { %>
 import babel from 'gulp-babel';<% } %>
 import gulpif from 'gulp-if';
-import concat from 'gulp-concat';
 import sassLint from 'gulp-sass-lint';
 import cssmin from 'gulp-cssmin';
 import imagemin from 'gulp-imagemin';
@@ -20,7 +19,6 @@ import eventStream from 'event-stream';
 import gutil from 'gulp-util';
 import webpack from 'webpack';<% if (featureModernizr) { %>
 import modernizr from 'gulp-modernizr';<% } %>
-import path from 'path';
 
 let isDevMode = false;
 let isServeTask = false;
