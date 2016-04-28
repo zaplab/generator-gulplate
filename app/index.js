@@ -310,6 +310,8 @@ module.exports = yeoman.generators.Base.extend({
                     'babel-eslint': '^6.0.4',
                     'eslint-config-airbnb': '^8.0.0',
                     'eslint-plugin-react': '^5.0.1',
+                    'eslint-plugin-import': '^1.6.1',
+                    'eslint-plugin-jsx-a11y': '^1.0.4',
                     'gulp-eslint': '^2.0.0',
                     'breakpoint-sass': '^2.7.0',
                     'compass-mixins': '^0.12.7',

@@ -179,7 +179,7 @@ gulp.task('setup-tests', gulpCallback => {
 gulp.task('setup', [
     'setup-tests',
 ]);
-<% } %><% if (testSassLint) { %>
+<% } %>
 gulp.task('test-css', () => {
     return gulp.src([
             '<%= sourcePath %>/css/**/*.scss',<% if (addDocumentation) { %>
@@ -193,15 +193,15 @@ gulp.task('test-css', () => {
         .pipe(sassLint.format())
         .pipe(sassLint.failOnError())
         .on('error', onWarning);
-});<% } %>
+});
 
 gulp.task('test-js', [
     'eslint',<% if (testKarma) { %>
     'specs',<% } %>
 ]);
 
-gulp.task('test', [<% if (testSassLint) { %>
-    'test-css',<% } %>
+gulp.task('test', [
+    'test-css',
     'test-js',
 ]);<% if (addDocumentation) { %>
 
