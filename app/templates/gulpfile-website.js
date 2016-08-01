@@ -256,6 +256,17 @@ gulp.task('css', [
 ], () => {
     const postcss = require('gulp-postcss');
     const autoprefixer = require('autoprefixer');
+    const postcssPlugins = [
+        autoprefixer({
+            browsers: [
+                'last 2 versions',
+            ],
+        }),
+    ];
+
+    if (!isDevMode) {
+        postcssPlugins.push(require('cssnano')());
+    }
 
     return gulp.src('<%= sourcePath %>/css/main.scss')
         .pipe(gulpif(isDevMode, sourcemaps.init()))
@@ -265,19 +276,10 @@ gulp.task('css', [
                 'node_modules',
             ],
         }))
-        .pipe(postcss([
-            autoprefixer({
-                browsers: [
-                    'last 2 versions',
-                ],
-            }),
-        ]))
+        .pipe(postcss(postcssPlugins))
         .pipe(gulpif(isDevMode, sourcemaps.write('./')))
         .pipe(gulpif(!isDevMode, header(banner, {
             pkg: pkg,
-        })))
-        .pipe(gulpif(!isDevMode, cssmin({
-            aggressiveMerging: false,
         })))
         .pipe(gulp.dest('<%= distributionPath %>/resources/css'))
         .pipe(gulpif(isServeTask, browserSync.stream({
