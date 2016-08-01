@@ -106,7 +106,7 @@ gulp.task('clean:doc', gulpCallback => {
 gulp.task('eslint', () => {
     return gulp.src('<%= sourcePath %>/js/**/*.js')
         .pipe(eslint({
-            configFile: '<%= testsPath %>/.eslintrc',
+            configFile: '.eslintrc',
         }))
         .pipe(eslint.format())
         .on('error', onWarning);
@@ -185,7 +185,7 @@ gulp.task('test-css', () => {
         ])
         .pipe(sassLint({
             options: {
-                'config-file': '<%= testsPath %>/.sass-lint.yml',
+                'config-file': '.sass-lint.yml',
             },
         }))
         .pipe(sassLint.format())

@@ -250,7 +250,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         sasslint: function () {
-            this.copy('tests/sass-lint.yml', this.testsPath + '/.sass-lint.yml');
+            this.copy('tests/sass-lint.yml', '.sass-lint.yml');
         },
 
         editorConfig: function () {
@@ -270,7 +270,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         eslint: function () {
-            this.copy('tests/eslintrc', this.testsPath + '/.eslintrc');
+            this.copy('tests/eslintrc', '.eslintrc');
         },
 
         modules: function () {
