@@ -1,19 +1,21 @@
 'use strict';
 
 var yeoman = require('yeoman-generator'),
-    chalk = require('chalk');
+    chalk = require('chalk'),
+    mkdirp = require('mkdirp'),
+    slugify = require('zap-base-js-string').slugify;
 
-module.exports = yeoman.generators.Base.extend({
+module.exports = yeoman.Base.extend({
     constructor: function ()
     {
-        yeoman.generators.Base.apply(this, arguments);
+        yeoman.Base.apply(this, arguments);
 
         this.argument('project-name', {
             type: String,
             required: false
         });
         this.projectName = this['project-name'] || 'project-name';
-        this.projectName = this._.slugify(this.projectName);
+        this.projectName = slugify(this.projectName);
 
         this.option('skip-install', {
             type: Boolean,
@@ -36,7 +38,7 @@ module.exports = yeoman.generators.Base.extend({
                 default: this.projectName
             }, function (answers) {
                 this.projectName = answers.name;
-                this.projectName = this._.slugify(this.projectName);
+                this.projectName = slugify(this.projectName);
                 this.config.set('projectName', this.projectName);
 
                 done();
@@ -104,7 +106,7 @@ module.exports = yeoman.generators.Base.extend({
             default: 'src'
         }, function (answers) {
             this.sourcePath = answers['src-path'];
-            this.sourcePath = this._.slugify(this.sourcePath);
+            this.sourcePath = slugify(this.sourcePath);
             this.config.set('sourcePath', this.sourcePath);
 
             done();
@@ -122,7 +124,7 @@ module.exports = yeoman.generators.Base.extend({
             default: 'dist'
         }, function (answers) {
             this.distributionPath = answers['dist-path'];
-            this.distributionPath = this._.slugify(this.distributionPath);
+            this.distributionPath = slugify(this.distributionPath);
             this.config.set('distributionPath', this.distributionPath);
 
             done();
@@ -160,7 +162,7 @@ module.exports = yeoman.generators.Base.extend({
                 default: 'doc'
             }, function (answers) {
                 this.documentationPath = answers['doc-path'];
-                this.documentationPath = this._.slugify(this.documentationPath);
+                this.documentationPath = slugify(this.documentationPath);
                 this.config.set('docPath', this.documentationPath);
 
                 done();
@@ -207,7 +209,7 @@ module.exports = yeoman.generators.Base.extend({
             default: 'tests'
         }, function (answers) {
             this.testsPath = answers['tests-path'];
-            this.testsPath = this._.slugify(this.testsPath);
+            this.testsPath = slugify(this.testsPath);
             this.config.set('testsPath', this.testsPath);
 
             done();
@@ -280,7 +282,7 @@ module.exports = yeoman.generators.Base.extend({
 
         packageJSON: function () {
             var packageJSON = {
-                    name: this._.slugify(this.projectName),
+                    name: slugify(this.projectName),
                     private: true,
                     version: '0.0.0',
                     author: {
@@ -393,11 +395,11 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         source: function () {
-            this.mkdir(this.sourcePath);
-            this.mkdir(this.sourcePath + '/css');
-            this.mkdir(this.sourcePath + '/fonts');
-            this.mkdir(this.sourcePath + '/img');
-            this.mkdir(this.sourcePath + '/js');
+            mkdirp(this.sourcePath);
+            mkdirp(this.sourcePath + '/css');
+            mkdirp(this.sourcePath + '/fonts');
+            mkdirp(this.sourcePath + '/img');
+            mkdirp(this.sourcePath + '/js');
 
             this.copy('src/js/main.js', this.sourcePath + '/js/main.js');
 
@@ -408,7 +410,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         dist: function () {
-            this.mkdir(this.distributionPath);
+            mkdirp(this.distributionPath);
         },
 
         doc: function () {
@@ -437,7 +439,7 @@ module.exports = yeoman.generators.Base.extend({
 
         test: function () {
             if (this.testKarma) {
-                this.mkdir(this.testsPath + '/spec');
+                mkdirp(this.testsPath + '/spec');
                 this.copy('tests/spec/_basic.js', this.testsPath + '/spec/_basic.js');
                 this.copy('tests/spec/main.js', this.testsPath + '/spec/main.js');
                 this.copy('tests/specs.html', this.testsPath + '/specs.html');
