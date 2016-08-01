@@ -294,27 +294,28 @@ module.exports = yeoman.generators.Base.extend({
                 gulpModules = {
                     autoprefixer: '^6.3.6',
                     'babel-core': '^6.7.0',
-                    "babel-plugin-add-module-exports": "^0.1.2",
-                    "babel-plugin-transform-async-to-generator": "6.7.0",
-                    "babel-plugin-transform-class-properties": "6.6.0",
-                    "babel-plugin-transform-es2015-destructuring": "6.6.5",
-                    "babel-plugin-transform-es2015-function-name": "6.5.0",
-                    "babel-plugin-transform-es2015-modules-commonjs": "6.7.0",
-                    "babel-plugin-transform-es2015-parameters": "6.7.0",
-                    "babel-plugin-transform-es2015-spread": "6.6.5",
-                    "babel-plugin-transform-es2015-sticky-regex": "6.5.0",
-                    "babel-plugin-transform-es2015-unicode-regex": "6.5.0",
-                    "babel-plugin-transform-object-rest-spread": "6.6.5",
+                    "babel-plugin-add-module-exports": "^0.2.1",
+                    "babel-plugin-transform-async-to-generator": "6.8.0",
+                    "babel-plugin-transform-class-properties": "6.11.5",
+                    "babel-plugin-transform-es2015-destructuring": "6.9.0",
+                    "babel-plugin-transform-es2015-function-name": "6.9.0",
+                    "babel-plugin-transform-es2015-modules-commonjs": "6.11.5",
+                    "babel-plugin-transform-es2015-parameters": "6.11.4",
+                    "babel-plugin-transform-es2015-spread": "6.8.0",
+                    "babel-plugin-transform-es2015-sticky-regex": "6.8.0",
+                    "babel-plugin-transform-es2015-unicode-regex": "6.11.0",
+                    "babel-plugin-transform-object-rest-spread": "6.8.0",
                     'babel-plugin-transform-object-assign': '^6.5.0',
                     'babel-preset-es2015': '^6.6.0',
                     'babel-preset-stage-0': '^6.5.0',
                     'babel-eslint': '^6.0.4',
-                    'eslint-config-airbnb': '^8.0.0',
-                    'eslint-plugin-react': '^5.0.1',
                     'cssnano': '^3.7.3',
+                    'eslint': '^3.2.2',
+                    'eslint-config-airbnb': '^10.0.0',
                     'eslint-plugin-import': '^1.6.1',
-                    'eslint-plugin-jsx-a11y': '^1.0.4',
-                    'gulp-eslint': '^2.0.0',
+                    'eslint-plugin-jsx-a11y': '^2.0.1',
+                    'eslint-plugin-react': '^6.0.0',
+                    'gulp-eslint': '^3.0.1',
                     'breakpoint-sass': '^2.7.0',
                     'compass-mixins': '^0.12.7',
                     del: '^2.2.0',
@@ -323,16 +324,16 @@ module.exports = yeoman.generators.Base.extend({
                     'gulp-babel': '^6.1.2',
                     'gulp-util': '^3.0.7',
                     'gulp-header': '^1.7.1',
-                    'gulp-htmlmin': '^1.3.0',
+                    'gulp-htmlmin': '^2.0.0',
                     'gulp-if': '^2.0.0',
-                    'gulp-imagemin': '^2.4.0',
+                    'gulp-imagemin': '^3.0.2',
                     'gulp-postcss': '^6.1.0',
                     'gulp-sass': '^2.2.0',
                     'gulp-sass-lint': '^1.1.1',
                     'gulp-sourcemaps': '^1.6.0',
                     'gulp-uglify': '^1.5.3',
-                    'imagemin-pngquant': '^4.2.2',
-                    'node-sass': '3.4.2',
+                    'imagemin-pngquant': '^5.0.0',
+                    'node-sass': '3.8.0',
                     'run-sequence': '^1.1.5',
                     susy: '^2.2.12',
                     yargs: '^4.4.0',
@@ -367,10 +368,10 @@ module.exports = yeoman.generators.Base.extend({
 
             if (this.testKarma) {
                 packageJSON.devDependencies['phantomjs'] = '^1.9.20';
-                packageJSON.devDependencies['karma'] = '^0.13.22';
-                packageJSON.devDependencies['karma-jasmine'] = '^0.3.8';
-                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^0.2.3';
-                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.25';
+                packageJSON.devDependencies['karma'] = '^1.1.2';
+                packageJSON.devDependencies['karma-jasmine'] = '^1.0.2';
+                packageJSON.devDependencies['karma-phantomjs-launcher'] = '^1.0.1';
+                packageJSON.devDependencies['karma-spec-reporter'] = '^0.0.26';
                 packageJSON.devDependencies['karma-webpack'] = '^1.7.0';
 
                 packageJSON.devDependencies['jasmine'] = '^2.4.1 ';
