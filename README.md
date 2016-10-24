@@ -74,11 +74,12 @@ your choices:
 │       ├── index.html
 │       └── subpage.html
 ├── tests
-│   ├── .eslintrc
-│   └── .sass-lint.yml
 ├── .babelrc
 ├── .editorconfig
+├── .eslintrc
+├── .gitattributes
 ├── .gitignore
+├── .sass-lint.yml
 ├── gulpfile.babel.js
 ├── package.json
 └── webpack.config.js
@@ -105,11 +106,12 @@ your choices:
 │       ├── main.js
 │       └── module-a.js
 ├── tests
-│   ├── .eslintrc
-│   └── .sass-lint.yml
 ├── .babelrc
 ├── .editorconfig
+├── .eslintrc
+├── .gitattributes
 ├── .gitignore
+├── .sass-lint.yml
 ├── gulpfile.babel.js
 ├── package.json
 └── webpack.config.js
