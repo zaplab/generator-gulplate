@@ -5,7 +5,6 @@ import gulp from 'gulp';<% if (transformJs) { %>
 import babel from 'gulp-babel';<% } %>
 import gulpif from 'gulp-if';
 import sassLint from 'gulp-sass-lint';
-import cssmin from 'gulp-cssmin';
 import imagemin from 'gulp-imagemin';
 import pngquant from 'imagemin-pngquant';
 import eslint from 'gulp-eslint';

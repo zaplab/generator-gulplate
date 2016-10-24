@@ -4,7 +4,6 @@ import del from 'del';
 import gulp from 'gulp';
 import gulpif from 'gulp-if';
 import sassLint from 'gulp-sass-lint';
-import cssmin from 'gulp-cssmin';
 import imagemin from 'gulp-imagemin';
 import pngquant from 'imagemin-pngquant';
 import eslint from 'gulp-eslint';
