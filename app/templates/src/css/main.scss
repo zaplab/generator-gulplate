@@ -12,20 +12,5 @@ body {
         &:before {
             content: 'gulplate ';
         }
-    }<% if (((projectType === 'module') && addDocumentation && featureModernizr) || ((projectType === 'website') && featureModernizr)) { %>
-
-    // modernizr example
-    html.csstransforms & {
-        &:after {
-            content: 'supports csstransform';
-            color: #0f0;
-        }
     }
-
-    html.no-csstransforms & {
-        &:after {
-            content: 'does not support csstransform';
-            color: #f00;
-        }
-    }<% } %>
 }

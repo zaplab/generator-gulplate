@@ -216,36 +216,6 @@ module.exports = yeoman.Base.extend({
         }.bind(this));
     },
 
-    promptFeatures: function ()
-    {
-        var done = this.async(),
-            prompts = {
-                type: 'checkbox',
-                name: 'features',
-                message: 'Extras',
-                choices: [
-                    {
-                        name: 'Use Modernizr',
-                        value: 'modernizr',
-                        checked: true
-                    }
-                ]
-            },
-            hasFeature = function (features, feature) {
-                return features.indexOf(feature) !== -1;
-            };
-
-        this.log('By default breakpoint-sass, compass-mixins and susy2-grid are included.');
-
-        this.prompt(prompts, function (answers) {
-            var features = answers.features;
-            this.featureModernizr = hasFeature(features, 'modernizr');
-            this.config.set('featureModernizr', this.featureModernizr);
-
-            done();
-        }.bind(this));
-    },
-
     writing: {
         babel: function () {
             this.copy('babelrc', '.babelrc');
@@ -333,7 +303,6 @@ module.exports = yeoman.Base.extend({
                     'gulp-sass': '^2.2.0',
                     'gulp-sass-lint': '^1.1.1',
                     'gulp-sourcemaps': '^2.2.0',
-                    'gulp-uglify': '^2.0.0',
                     'imagemin-pngquant': '^5.0.0',
                     'node-sass': '3.10.1',
                     'run-sequence': '^1.1.5',
@@ -385,10 +354,6 @@ module.exports = yeoman.Base.extend({
                 packageJSON.scripts = {
                     test: 'karma start',
                 };
-            }
-
-            if (this.featureModernizr) {
-                packageJSON.devDependencies['gulp-modernizr'] = '^1.0.0-alpha';
             }
 
             this.write('package.json', JSON.stringify(packageJSON, null, 2));

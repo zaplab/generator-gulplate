@@ -8,7 +8,6 @@ import sassLint from 'gulp-sass-lint';
 import imagemin from 'gulp-imagemin';
 import pngquant from 'imagemin-pngquant';
 import eslint from 'gulp-eslint';
-import uglify from 'gulp-uglify';
 import sass from 'gulp-sass';
 import sourcemaps from 'gulp-sourcemaps';
 import browserSync from 'browser-sync';
@@ -16,8 +15,7 @@ import runSequence from 'run-sequence';
 import header from 'gulp-header';
 import eventStream from 'event-stream';
 import gutil from 'gulp-util';
-import webpack from 'webpack';<% if (featureModernizr) { %>
-import modernizr from 'gulp-modernizr';<% } %>
+import webpack from 'webpack';
 
 let isDevMode = false;
 let isServeTask = false;
@@ -268,23 +266,7 @@ gulp.task('copy:scss', () => {
     return gulp.src('<%= sourcePath %>/css/**/*.scss')
         .pipe(gulp.dest('<%= distributionPath %>/scss'))
         .on('error', onError);
-});<% if (addDocumentation && featureModernizr) { %>
-
-gulp.task('modernizr', () => {
-    return gulp.src([
-            '<%= sourcePath %>/css/**/*.scss',
-            '<%= sourcePath %>/js/**/*.js',
-        ])
-        .pipe(modernizr('init.js', {
-            options: [
-                'setClasses',
-                'testProp',
-            ],
-        }))
-        .pipe(gulpif(!isDevMode, uglify()))
-        .pipe(gulp.dest('<%= documentationPath %>/resources/js'))
-        .on('error', onError);
-});<% } %>
+});
 
 gulp.task('js', [
     'eslint',
@@ -435,8 +417,7 @@ gulp.task('watch', () => {
                 'js:doc',
                 'fonts:doc',
                 'images:doc',
-            ]<% if (featureModernizr) { %>,
-            'modernizr'<% } %>
+            ]
         );
     });
 });
@@ -452,8 +433,7 @@ gulp.task('doc', [
             'js:doc',
             'fonts:doc',
             'images:doc',
-        ],<% if (featureModernizr) { %>
-        'modernizr',<% } %>
+        ],
         gulpCallback
     );
 });
