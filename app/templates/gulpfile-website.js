@@ -100,7 +100,7 @@ gulp.task('eslint', () => {
 
 // for easier debugging of the generated spec bundle
 gulp.task('specs:debug', gulpCallback => {
-    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
+    const webpackConfig = Object.assign({}, require('./webpack.config.babel.js'), {
         context: __dirname,
         entry: '<%= testsPath %>/spec/main.js',
         output: {
@@ -288,7 +288,7 @@ gulp.task('css', [
 gulp.task('js', [
     'eslint',
 ], gulpCallback => {
-    const webpackConfig = Object.assign({}, require('./webpack.config.js'), {
+    const webpackConfig = Object.assign({}, require('./webpack.config.babel.js'), {
         context: __dirname,
         entry: '<%= sourcePath %>/js/main.js',
         output: {

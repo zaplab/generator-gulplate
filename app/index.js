@@ -399,7 +399,7 @@ module.exports = yeoman.Base.extend({
         },
 
         webpack: function () {
-            this.copy('webpack.config.js');
+            this.copy('webpack.config.babel.js');
         },
 
         test: function () {

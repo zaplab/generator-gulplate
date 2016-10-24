@@ -82,7 +82,7 @@ your choices:
 ├── .sass-lint.yml
 ├── gulpfile.babel.js
 ├── package.json
-└── webpack.config.js
+└── webpack.config.babel.js
 ```
 
 ### If Project-Type is "Module/Plugin/Library":
@@ -114,7 +114,7 @@ your choices:
 ├── .sass-lint.yml
 ├── gulpfile.babel.js
 ├── package.json
-└── webpack.config.js
+└── webpack.config.babel.js
 ```
 
 If you want to add a Documentation for your "Module/Plugin/Library"

@@ -45,7 +45,7 @@ module.exports = function (config) {
             'spec',
         ],
 
-        webpack: Object.assign({}, require('./webpack.config.js'), {
+        webpack: Object.assign({}, require('./webpack.config.babel.js'), {
             module: {
                 loaders: [
                     {
