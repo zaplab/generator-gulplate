@@ -139,7 +139,7 @@ module.exports = yeoman.Base.extend({
             this.prompt({
                 type: 'confirm',
                 name: 'documentation',
-                message: 'Add Documentation',
+                message: 'Add Demo / Documentation',
                 default: true
             }, function (answers) {
                 this.addDocumentation = answers.documentation;
@@ -158,7 +158,7 @@ module.exports = yeoman.Base.extend({
             this.prompt({
                 type: 'input',
                 name: 'doc-path',
-                message: 'Documentation Path',
+                message: 'Demo / Documentation Path',
                 default: 'doc'
             }, function (answers) {
                 this.documentationPath = answers['doc-path'];
